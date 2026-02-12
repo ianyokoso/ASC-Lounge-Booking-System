@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { db } from "@/db";
+import { reservations } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function DELETE(req: Request) {
     try {
@@ -11,12 +13,8 @@ export async function DELETE(req: Request) {
         }
 
         // TODO: Add admin authentication check here
-        // For now, we assume this route is protected by middleware or obscure URL
-        // In a real app, verify session_user_id is an admin
 
-        await prisma.reservation.delete({
-            where: { id },
-        });
+        await db.delete(reservations).where(eq(reservations.id, id));
 
         return NextResponse.json({ message: "삭제되었습니다" });
     } catch (error) {

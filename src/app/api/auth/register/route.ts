@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
@@ -8,25 +8,28 @@ export async function POST(req: Request) {
 
         if (!username || !password) {
             return NextResponse.json(
-                { error: "아이디와 비밀번호를 입력해주세요." },
+                { error: "사용자명과 비밀번호는 필수입니다" },
                 { status: 400 }
             );
         }
 
+        // 중복 사용자 확인
         const existingUser = await prisma.user.findUnique({
             where: { username },
         });
 
         if (existingUser) {
             return NextResponse.json(
-                { error: "이미 존재하는 아이디입니다." },
+                { error: "이미 존재하는 사용자명입니다" },
                 { status: 400 }
             );
         }
 
+        // 비밀번호 해싱
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await prisma.user.create({
+        // 사용자 생성
+        const newUser = await prisma.user.create({
             data: {
                 username,
                 password: hashedPassword,
@@ -35,13 +38,13 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json(
-            { message: "회원가입 성공", userId: user.id },
+            { message: "회원가입 성공", userId: newUser.id },
             { status: 201 }
         );
-    } catch (error) {
-        console.error("Registration error:", error);
+    } catch (error: any) {
+        console.error("회원가입 오류:", error);
         return NextResponse.json(
-            { error: "서버 오류가 발생했습니다." },
+            { error: "회원가입 중 오류가 발생했습니다" },
             { status: 500 }
         );
     }

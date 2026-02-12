@@ -140,57 +140,87 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.5);
-                    backdrop-filter: blur(4px);
+                    background: rgba(15, 23, 42, 0.6);
+                    backdrop-filter: blur(8px);
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     z-index: 2000;
-                    animation: fadeIn 0.2s ease-out;
+                    padding: 20px;
+                    animation: fadeIn 0.3s ease-out;
                 }
                 @keyframes fadeIn {
                     from { opacity: 0; }
                     to { opacity: 1; }
                 }
                 .auth-container {
-                    width: 90%;
-                    max-width: 400px;
+                    width: 100%;
+                    max-width: 440px;
                     position: relative;
                     background: white;
-                    padding: 32px;
-                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-                    animation: slideUp 0.3s ease-out;
+                    padding: 40px;
+                    border-radius: 24px;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 }
                 @keyframes slideUp {
-                    from { transform: translateY(20px); opacity: 0; }
+                    from { transform: translateY(30px); opacity: 0; }
                     to { transform: translateY(0); opacity: 1; }
                 }
                 .btn-close {
                     position: absolute;
-                    top: 16px;
-                    right: 16px;
-                    background: none;
+                    top: 20px;
+                    right: 20px;
+                    background: #f8fafc;
                     border: none;
-                    color: var(--text-muted);
-                    padding: 8px;
+                    color: #94a3b8;
+                    width: 36px;
+                    height: 36px;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 50%;
+                    border-radius: 12px;
                     transition: all 0.2s;
                 }
                 .btn-close:hover {
                     background: #f1f5f9;
-                    color: var(--text-main);
+                    color: #0f172a;
                 }
-                .w-full { width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; }
-                .auth-header { margin-bottom: 24px; text-align: center; }
-                .auth-header h3 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-                .auth-header p { font-size: 14px; color: var(--text-muted); }
-                .auth-footer { margin-top: 16px; text-align: center; }
-                .btn-text { background: none; color: var(--primary); font-size: 14px; font-weight: 500; }
-                .btn-text:hover { text-decoration: underline; }
+                .w-full { 
+                    width: 100%; 
+                    margin-top: 10px;
+                }
+                .auth-header { 
+                    margin-bottom: 32px; 
+                    text-align: center; 
+                }
+                .auth-header h3 { 
+                    font-size: 24px; 
+                    font-weight: 800; 
+                    margin-bottom: 8px; 
+                    color: #0f172a;
+                    letter-spacing: -0.025em;
+                }
+                .auth-header p { 
+                    font-size: 15px; 
+                    color: #64748b; 
+                }
+                .auth-footer { 
+                    margin-top: 24px; 
+                    text-align: center; 
+                }
+                .btn-text { 
+                    background: none; 
+                    color: #4f46e5; 
+                    font-size: 14px; 
+                    font-weight: 600; 
+                    padding: 8px;
+                }
+                .btn-text:hover { 
+                    color: #4338ca;
+                    text-decoration: underline; 
+                }
             `}</style>
         </div>
     );

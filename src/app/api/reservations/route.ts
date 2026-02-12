@@ -1,124 +1,177 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
-import { sendDiscordNotification } from "@/lib/discord";
 
-export async function GET() {
+// GET: 예약 조회
+export async function GET(req: Request) {
     try {
+        const cookieStore = await cookies();
+        const userId = cookieStore.get("userId")?.value;
+
+        if (!userId) {
+            return NextResponse.json(
+                { error: "로그인이 필요합니다" },
+                { status: 401 }
+            );
+        }
+
         const reservations = await prisma.reservation.findMany({
+            where: { userId },
             include: {
                 user: {
                     select: {
-                        name: true,
                         username: true,
+                        name: true,
                     },
                 },
             },
+            orderBy: {
+                createdAt: "desc",
+            },
         });
-        return NextResponse.json(reservations);
-    } catch (error) {
-        return NextResponse.json({ error: "조회 실패" }, { status: 500 });
+
+        return NextResponse.json({ reservations });
+    } catch (error: any) {
+        console.error("예약 조회 오류:", error);
+        return NextResponse.json(
+            { error: "예약 조회 중 오류가 발생했습니다" },
+            { status: 500 }
+        );
     }
 }
 
+// POST: 예약 생성
 export async function POST(req: Request) {
     try {
-        const userId = (await cookies()).get("session_user_id")?.value;
+        const cookieStore = await cookies();
+        const userId = cookieStore.get("userId")?.value;
+
         if (!userId) {
-            return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+            return NextResponse.json(
+                { error: "로그인이 필요합니다" },
+                { status: 401 }
+            );
         }
 
-        const { date, timeSlot } = await req.json();
+        const { date, timeSlot, name, discordId } = await req.json();
 
-        // 하루 최대 3시간 제한 확인 (슬롯 하나가 3시간이므로 하루에 한 번만 예약 가능하다고 가정)
-        const existingDayRegistration = await prisma.reservation.findFirst({
-            where: {
-                userId,
-                date,
-            },
-        });
-
-        if (existingDayRegistration) {
+        if (!date || !timeSlot) {
             return NextResponse.json(
-                { error: "이미 해당 날짜에 예약이 있습니다. (하루 최대 3시간)" },
+                { error: "날짜와 시간은 필수입니다" },
                 { status: 400 }
             );
         }
 
-        // 중복 슬롯 확인
-        const slotTaken = await prisma.reservation.findUnique({
-            where: {
-                date_timeSlot: {
-                    date,
-                    timeSlot,
+        // 사용자 정보 업데이트 (이름 및 Discord ID)
+        if (name || discordId) {
+            await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    ...(name && { name }),
+                    ...(discordId && { discordId }),
                 },
-            },
-        });
-
-        if (slotTaken) {
-            return NextResponse.json(
-                { error: "이미 예약된 시간대입니다." },
-                { status: 400 }
-            );
+            });
         }
 
-        const reservation = await prisma.reservation.create({
-            data: {
-                userId,
+        // 중복 예약 확인
+        const existingReservation = await prisma.reservation.findFirst({
+            where: {
                 date,
                 timeSlot,
             },
         });
 
-        // 사용자 정보 조회 (알림용)
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        const userName = user?.name || user?.username || "알 수 없음";
+        if (existingReservation) {
+            return NextResponse.json(
+                { error: "해당 시간대는 이미 예약되었습니다" },
+                { status: 400 }
+            );
+        }
 
-        // Discord 알림 전송
-        await sendDiscordNotification(
-            `📢 **새로운 예약 알림**\n- 예약자: ${userName}\n- 날짜: ${date}\n- 시간: ${timeSlot}`
+        // 예약 생성
+        const newReservation = await prisma.reservation.create({
+            data: {
+                userId,
+                date,
+                timeSlot,
+            },
+            include: {
+                user: {
+                    select: {
+                        username: true,
+                        name: true,
+                        discordId: true,
+                    },
+                },
+            },
+        });
+
+        return NextResponse.json(
+            { message: "예약 성공", reservation: newReservation },
+            { status: 201 }
         );
-
-        return NextResponse.json(reservation, { status: 201 });
-    } catch (error) {
-        console.error("Reservation error:", error);
-        return NextResponse.json({ error: "예약 실패" }, { status: 500 });
+    } catch (error: any) {
+        console.error("예약 생성 오류:", error);
+        return NextResponse.json(
+            { error: "예약 생성 중 오류가 발생했습니다" },
+            { status: 500 }
+        );
     }
 }
 
+// DELETE: 예약 취소
 export async function DELETE(req: Request) {
     try {
-        const userId = (await cookies()).get("session_user_id")?.value;
+        const cookieStore = await cookies();
+        const userId = cookieStore.get("userId")?.value;
+
         if (!userId) {
-            return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+            return NextResponse.json(
+                { error: "로그인이 필요합니다" },
+                { status: 401 }
+            );
         }
 
-        const { id } = await req.json();
+        const { searchParams } = new URL(req.url);
+        const reservationId = searchParams.get("id");
 
-        if (!id) {
-            return NextResponse.json({ error: "예약 ID가 필요합니다." }, { status: 400 });
+        if (!reservationId) {
+            return NextResponse.json(
+                { error: "예약 ID가 필요합니다" },
+                { status: 400 }
+            );
         }
 
-        // 본인의 예약인지 확인
+        // 예약 확인 및 권한 검증
         const reservation = await prisma.reservation.findUnique({
-            where: { id },
+            where: { id: reservationId },
         });
 
         if (!reservation) {
-            return NextResponse.json({ error: "존재하지 않는 예약입니다." }, { status: 404 });
+            return NextResponse.json(
+                { error: "예약을 찾을 수 없습니다" },
+                { status: 404 }
+            );
         }
 
         if (reservation.userId !== userId) {
-            return NextResponse.json({ error: "취소 권한이 없습니다." }, { status: 403 });
+            return NextResponse.json(
+                { error: "예약을 취소할 권한이 없습니다" },
+                { status: 403 }
+            );
         }
 
+        // 예약 삭제
         await prisma.reservation.delete({
-            where: { id },
+            where: { id: reservationId },
         });
 
-        return NextResponse.json({ message: "예약이 취소되었습니다." });
-    } catch (error) {
-        console.error("Cancellation error:", error);
-        return NextResponse.json({ error: "취소 실패" }, { status: 500 });
+        return NextResponse.json({ message: "예약이 취소되었습니다" });
+    } catch (error: any) {
+        console.error("예약 취소 오류:", error);
+        return NextResponse.json(
+            { error: "예약 취소 중 오류가 발생했습니다" },
+            { status: 500 }
+        );
     }
 }

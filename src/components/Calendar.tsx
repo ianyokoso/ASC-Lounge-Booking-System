@@ -22,112 +22,203 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const days = [];
   const totalDays = daysInMonth(year, month);
   const startDay = firstDayOfMonth(year, month);
 
-  // Padding for start of month
-  for (let i = 0; i < startDay; i++) {
-    days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+  // Previous month days
+  const prevMonthDate = new Date(year, month - 1);
+  const prevMonthDays = daysInMonth(prevMonthDate.getFullYear(), prevMonthDate.getMonth());
+
+  const days = [];
+
+  // Add days from previous month
+  for (let i = startDay - 1; i >= 0; i--) {
+    const d = prevMonthDays - i;
+    days.push({
+      day: d,
+      month: month - 1,
+      year: year,
+      faded: true,
+      id: `prev-${d}`
+    });
   }
 
+  // Add current month days
   for (let d = 1; d <= totalDays; d++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const dateObj = new Date(year, month, d);
-    const isPast = dateObj < today;
-    const isSelected = selectedDate === dateStr;
-    const isToday = dateObj.toDateString() === today.toDateString();
+    days.push({
+      day: d,
+      month: month,
+      year: year,
+      faded: false,
+      id: `curr-${d}`
+    });
+  }
 
-    days.push(
-      <div
-        key={d}
-        className={`calendar-day ${isPast ? "past" : ""} ${isSelected ? "selected" : ""} ${isToday ? "today" : ""}`}
-        onClick={() => !isPast && onSelectDate(dateStr)}
-      >
-        {d}
-      </div>
-    );
+  // Add next month days to complete the grid (6 rows * 7 days = 42)
+  const remaining = 42 - days.length;
+  for (let d = 1; d <= remaining; d++) {
+    days.push({
+      day: d,
+      month: month + 1,
+      year: year,
+      faded: true,
+      id: `next-${d}`
+    });
   }
 
   const weekDayLabels = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
-    <div className="calendar">
-      <div className="calendar-header">
-        <button onClick={prevMonth} className="btn-icon"><ChevronLeft size={20} /></button>
-        <h3>{year}년 {month + 1}월</h3>
-        <button onClick={nextMonth} className="btn-icon"><ChevronRight size={20} /></button>
+    <div className="calendar-card">
+      <div className="calendar-nav-row">
+        <button onClick={prevMonth} className="nav-icon-btn"><ChevronLeft size={20} /></button>
+        <span className="nav-title">{year}년 {month + 1}월</span>
+        <button onClick={nextMonth} className="nav-icon-btn"><ChevronRight size={20} /></button>
       </div>
+
       <div className="calendar-grid">
-        {weekDayLabels.map((day, i) => (
-          <div key={day} className={`weekday ${i === 0 ? "sun" : i === 6 ? "sat" : ""}`}>{day}</div>
+        {weekDayLabels.map((label, i) => (
+          <div key={label} className={`weekday-label ${i === 0 ? "sun" : i === 6 ? "sat" : ""}`}>
+            {label}
+          </div>
         ))}
-        {days}
+
+        {days.map((item) => {
+          const dateObj = new Date(item.year, item.month, item.day);
+          const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
+          const isSelected = selectedDate === dateStr;
+          const isToday = dateObj.toDateString() === today.toDateString();
+          const isPast = dateObj < today;
+          const dayOfWeek = dateObj.getDay();
+
+          return (
+            <div
+              key={item.id}
+              className={`day-cell ${item.faded ? "faded" : ""} ${isSelected ? "selected" : ""} ${isToday ? "today" : ""} ${isPast && !item.faded ? "past" : ""}`}
+              onClick={() => !isPast && !item.faded && onSelectDate(dateStr)}
+            >
+              <div className={`day-number ${dayOfWeek === 0 ? "sun" : dayOfWeek === 6 ? "sat" : ""}`}>
+                {item.day}
+              </div>
+              {isToday && <div className="today-dot" />}
+            </div>
+          );
+        })}
       </div>
 
       <style jsx>{`
-        .calendar {
-          flex: 1;
+        .calendar-card {
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          padding: 24px;
+          user-select: none;
         }
-        .calendar-header {
+        .calendar-nav-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 24px;
+          padding: 0 4px;
+        }
+        .nav-icon-btn {
+          background: #f8fafc;
+          border: 1px solid #f1f5f9;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #64748b;
+          transition: all 0.2s;
+        }
+        .nav-icon-btn:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+        }
+        .nav-title {
+          font-size: 18px;
+          font-weight: 800;
+          color: #0f172a;
+          letter-spacing: -0.02em;
         }
         .calendar-grid {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
-          gap: 8px;
+          gap: 6px;
         }
-        .weekday {
+        .weekday-label {
           text-align: center;
           font-size: 13px;
-          color: var(--text-muted);
-          padding-bottom: 12px;
+          font-weight: 700;
+          color: #64748b;
+          padding: 12px 0;
         }
-        .sun { color: #f43f5e; }
-        .sat { color: #3b82f6; }
-        .calendar-day {
-          height: 48px;
+        .weekday-label.sun { color: #f43f5e; }
+        .weekday-label.sat { color: #3b82f6; }
+
+        .day-cell {
+          aspect-ratio: 1;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           border-radius: 12px;
-          font-weight: 500;
+          position: relative;
           transition: all 0.2s;
         }
-        .calendar-day:hover:not(.past):not(.empty) {
-          background: #f1f5f9;
+        .day-number {
+          font-size: 15px;
+          font-weight: 600;
+          color: #334155;
         }
-        .calendar-day.selected {
-          background: #1e293b;
-          color: white;
+        .day-number.sun { color: #f43f5e; }
+        .day-number.sat { color: #3b82f6; }
+
+        .day-cell.faded .day-number {
+          color: #e2e8f0;
         }
-        .calendar-day.past {
+        .day-cell.past:not(.faded) .day-number {
           color: #cbd5e1;
+        }
+        .day-cell.past:not(.faded) {
           cursor: not-allowed;
         }
-        .calendar-day.today {
-           border: 1px solid var(--primary);
-           color: var(--primary);
-           font-weight: 700;
+
+        .day-cell:hover:not(.faded):not(.past):not(.selected) {
+          background: #f1f5f9;
         }
-        .btn-icon {
-          background: transparent;
-          border: 1px solid var(--border);
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 10px;
+
+        .day-cell.today {
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
         }
-        .btn-icon:hover {
-          background: #f8fafc;
+        .day-cell.today .day-number {
+          color: #0f172a;
+        }
+        .today-dot {
+          width: 4px;
+          height: 4px;
+          background: #0f172a;
+          border-radius: 50%;
+          position: absolute;
+          bottom: 10px;
+        }
+
+        .day-cell.selected {
+          background: #0f172a;
+          border-color: #0f172a;
+        }
+        .day-cell.selected .day-number {
+          color: white;
+        }
+        .day-cell.selected .today-dot {
+          background: white;
         }
       `}</style>
     </div>
   );
 }
+

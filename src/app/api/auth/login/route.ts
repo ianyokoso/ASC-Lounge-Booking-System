@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 
@@ -7,42 +7,56 @@ export async function POST(req: Request) {
     try {
         const { username, password } = await req.json();
 
+        if (!username || !password) {
+            return NextResponse.json(
+                { error: "사용자명과 비밀번호는 필수입니다" },
+                { status: 400 }
+            );
+        }
+
+        // 사용자 조회
         const user = await prisma.user.findUnique({
             where: { username },
         });
 
         if (!user) {
             return NextResponse.json(
-                { error: "사용자를 찾을 수 없거나 비밀번호가 틀렸습니다." },
-                { status: 401 }
+                { error: "사용자를 찾을 수 없습니다" },
+                { status: 404 }
             );
         }
 
+        // 비밀번호 확인
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             return NextResponse.json(
-                { error: "사용자를 찾을 수 없거나 비밀번호가 틀렸습니다." },
+                { error: "비밀번호가 일치하지 않습니다" },
                 { status: 401 }
             );
         }
 
-        // 간단한 세션 처리 (실제 프로젝트에서는 JWT 등을 권장하나 여기서는 단순 아이디 쿠키로 처리)
-        (await cookies()).set("session_user_id", user.id, {
+        // 쿠키 설정
+        const cookieStore = await cookies();
+        cookieStore.set("userId", user.id, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            maxAge: 60 * 60 * 24 * 7, // 1주일
-            path: "/",
+            sameSite: "lax",
+            maxAge: 60 * 60 * 24 * 7, // 7일
         });
 
         return NextResponse.json({
             message: "로그인 성공",
-            user: { id: user.id, username: user.username, name: user.name },
+            user: {
+                id: user.id,
+                username: user.username,
+                name: user.name,
+            },
         });
-    } catch (error) {
-        console.error("Login error:", error);
+    } catch (error: any) {
+        console.error("로그인 오류:", error);
         return NextResponse.json(
-            { error: "서버 오류가 발생했습니다." },
+            { error: "로그인 중 오류가 발생했습니다" },
             { status: 500 }
         );
     }

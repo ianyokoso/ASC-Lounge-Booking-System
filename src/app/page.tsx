@@ -4,13 +4,26 @@ import { useState, useEffect } from "react";
 import Calendar from "@/components/Calendar";
 import TimeSelector from "@/components/TimeSelector";
 import AuthModal from "@/components/AuthModal";
-import { AlertCircle, Calendar as CalendarIcon, Info, Rocket, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar as CalendarIcon,
+  User as UserIcon,
+  Clock,
+  CheckCircle2,
+  Info,
+  Layout,
+  Loader2,
+  Trash2,
+  LogOut
+} from "lucide-react";
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
+  const [name, setName] = useState("");
+  const [discordId, setDiscordId] = useState("");
   const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -20,9 +33,13 @@ export default function Home() {
     try {
       const res = await fetch("/api/reservations");
       const data = await res.json();
-      setReservations(data);
+      if (Array.isArray(data)) {
+        setReservations(data);
+      } else {
+        setReservations([]);
+      }
     } catch (err) {
-      console.error("Fetch reservations failed");
+      setReservations([]);
     }
   };
 
@@ -30,9 +47,24 @@ export default function Home() {
     fetchReservations();
   }, []);
 
-  const disabledSlots = reservations
-    .filter((r) => r.date === selectedDate && r.status === "CONFIRMED")
-    .map((r) => r.timeSlot);
+  useEffect(() => {
+    if (user) {
+      setName(user.name || user.username || "");
+      setDiscordId(user.discordId || "");
+    }
+  }, [user]);
+
+  const disabledSlots = Array.isArray(reservations)
+    ? reservations
+      .filter((r) => r.date === selectedDate && r.status === "CONFIRMED")
+      .map((r) => r.timeSlot)
+    : [];
+
+  const isWeekend = (dateStr: string) => {
+    if (!dateStr) return false;
+    const day = new Date(dateStr).getDay();
+    return day === 0 || day === 6;
+  };
 
   const handleReservation = async () => {
     if (!user) {
@@ -53,7 +85,12 @@ export default function Home() {
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date: selectedDate, timeSlot: selectedSlot }),
+        body: JSON.stringify({
+          date: selectedDate,
+          timeSlot: selectedSlot,
+          name: name,
+          discordId: discordId
+        }),
       });
 
       const data = await res.json();
@@ -79,11 +116,39 @@ export default function Home() {
         <p>원하는 날짜와 시간을 선택해주세요</p>
       </header>
 
-      <div className="card grid-container">
-        <div className="calendar-section">
-          <div className="section-title">
-            <CalendarIcon size={18} />
-            <h4>날짜 선택</h4>
+      {error && (
+        <div className="alert alert-error">
+          <AlertCircle size={20} />
+          <div>
+            <strong>오류 발생:</strong> {error}
+          </div>
+        </div>
+      )}
+
+      {success && (
+        <div className="alert alert-success">
+          <CheckCircle2 size={20} />
+          <div>{success}</div>
+        </div>
+      )}
+
+      <div className="card main-grid">
+        <div className="section left-side">
+          <div className="section-header-row">
+            <div className="section-title">
+              <CalendarIcon size={20} />
+              <h4>날짜 선택</h4>
+            </div>
+            <button
+              className="btn-today-header"
+              onClick={() => {
+                const today = new Date();
+                const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+                setSelectedDate(dateStr);
+              }}
+            >
+              오늘
+            </button>
           </div>
           <Calendar
             selectedDate={selectedDate}
@@ -92,115 +157,160 @@ export default function Home() {
               setSelectedSlot("");
             }}
           />
+          {selectedDate && (
+            <div className="date-info-card">
+              <div className="date-info-top">
+                <div className="date-display-text">
+                  선택된 날짜: <strong>{selectedDate} ({["일", "월", "화", "수", "목", "금", "토"][new Date(selectedDate).getDay()]})</strong>
+                </div>
+                <span className={`badge ${isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
+                  {isWeekend(selectedDate) ? "주말" : "평일"}
+                </span>
+              </div>
+              <div className="date-sub-text">
+                {isWeekend(selectedDate) ? "언제든 이용 가능" : "저녁 7시부터 이용 가능"}
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="time-section">
+        <div className="section right-side">
           <TimeSelector
             selectedSlot={selectedSlot}
             onSelectSlot={setSelectedSlot}
             disabledSlots={disabledSlots}
           />
 
-          <div className="selection-info">
-            {selectedDate && (
-              <div className="info-box">
-                <div className="info-label">선택된 날짜</div>
-                <div className="info-value">{selectedDate}</div>
-                <div className="info-sub">저녁 7시부터 이용 가능</div>
+          <div className="user-info-section">
+            <div className="section-title">
+              <UserIcon size={20} />
+              <h4>예약자 정보</h4>
+            </div>
+            <div className="form-group">
+              <input
+                type="text"
+                placeholder="성함"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="premium-input"
+              />
+            </div>
+            <div className="form-group">
+              <input
+                type="text"
+                placeholder="Discord ID (선택사항 - DM 알림용)"
+                value={discordId}
+                onChange={(e) => setDiscordId(e.target.value)}
+                className="premium-input"
+              />
+              <p className="input-hint">💡 Discord ID는 선택사항입니다. 입력하면 예약 확정 시 DM으로 알림을 받을 수 있습니다.</p>
+            </div>
+          </div>
+
+          <div className="summary-box">
+            <div className="summary-title">● 예약 정보 확인</div>
+            <div className="summary-content">
+              <div className="summary-item">
+                <div className="item-left"><CalendarIcon size={16} /> 날짜:</div>
+                <div className="item-right">{selectedDate || "-"}</div>
               </div>
-            )}
+              <div className="summary-item">
+                <div className="item-left"><Clock size={16} /> 시간:</div>
+                <div className="item-right">{selectedSlot || "-"} (3시간)</div>
+              </div>
+              <div className="summary-item">
+                <div className="item-left"><UserIcon size={16} /> 예약자:</div>
+                <div className="item-right">{name || "-"}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="rules-card">
-        <div className="rules-header">
-          <Rocket size={18} className="rocket-icon" />
-          <h4>🚀 예약 안내</h4>
+      <div className="card guide-card">
+        <div className="section-title">
+          <Info size={18} />
+          <h4>예약 안내</h4>
         </div>
-        <ul>
-          <li>새로운 정책: 예약은 3시간 단위로 가능합니다</li>
-          <li>권장사항: 다른 회원들을 위해 일주일에 한 번 정도 이용을 권장합니다</li>
-          <li>평일은 저녁 7시부터, 주말은 제한이 없습니다</li>
+        <ul className="guide-list">
+          <li><strong>새로운 정책:</strong> 예약은 3시간 단위로 가능합니다</li>
+          <li><strong>권장사항:</strong> 다른 회원들을 위해 일주일에 한 번 정도 이용을 권장합니다</li>
+          <li>평일은 저녁 7시부터, 주말은 제한 없이 이용 가능합니다</li>
           <li>1인당 하루 최대 3시간까지 예약 가능합니다</li>
           <li>예약 취소는 이용 1시간 전까지 가능합니다</li>
-          <li>예약 완료 시 즉시 확정됩니다</li>
+          <li>예약 완료 시 즉시 확정되며 디스코드 DM으로 알림이 발송됩니다</li>
         </ul>
       </div>
 
-      <div className="action-area">
-        {error && <div className="alert alert-error"><AlertCircle size={16} /> {error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
-
-        <div className="btn-group">
-          <button
-            className="btn-primary reservation-btn"
-            disabled={!selectedDate || !selectedSlot || loading}
-            onClick={handleReservation}
-          >
-            {loading ? <Loader2 className="animate-spin" /> : "예약 확정"}
-          </button>
-          <button className="btn-outline" onClick={() => {
-            setSelectedDate("");
-            setSelectedSlot("");
-            setError("");
-            setSuccess("");
-          }}>
-            초기화
-          </button>
-        </div>
+      <div className="footer-actions">
+        <button
+          className="btn-primary confirm-btn"
+          disabled={!selectedDate || !selectedSlot || loading}
+          onClick={handleReservation}
+        >
+          {loading ? <Loader2 className="animate-spin" /> : "예약 확정"}
+        </button>
+        <button className="btn-outline reset-btn" onClick={() => {
+          setSelectedDate("");
+          setSelectedSlot("");
+          setError("");
+          setSuccess("");
+        }}>
+          초기화
+        </button>
       </div>
 
-      {user && (
-        <>
-          {/* My Reservations Section */}
-          {reservations.filter(r => r.userId === user?.id).length > 0 && (
-            <div className="my-reservations fade-in">
-              <h3 className="section-header">📅 내 예약 현황</h3>
-              <div className="reservation-list">
-                {reservations
-                  .filter(r => r.userId === user?.id)
-                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                  .map((r) => (
-                    <div key={r.id} className="reservation-item">
-                      <div className="res-info">
-                        <span className="res-date">{r.date}</span>
-                        <span className="res-time">{r.timeSlot}</span>
-                      </div>
-                      <button
-                        className="btn-cancel"
-                        onClick={async () => {
-                          if (!confirm("정말 예약을 취소하시겠습니까?")) return;
-                          try {
-                            const res = await fetch("/api/reservations", {
-                              method: "DELETE",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ id: r.id }),
-                            });
-                            if (!res.ok) {
-                              const data = await res.json();
-                              throw new Error(data.error || "취소 실패");
-                            }
-                            setSuccess("예약이 취소되었습니다.");
-                            fetchReservations();
-                          } catch (err: any) {
-                            setError(err.message);
-                          }
-                        }}
-                      >
-                        취소
-                      </button>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
-          <div className="user-status">
-            접속 중: <strong>{user.name || user.username}</strong>님 (임시 로그인)
-            <button className="btn-logout" onClick={() => setUser(null)}>로그아웃</button>
+      {user ? (
+        <div className="my-status">
+          <div className="user-profile">
+            <Layout size={16} />
+            접속 중: <strong>{user.username}</strong>
           </div>
-        </>
+          <button className="logout-link" onClick={() => {
+            document.cookie = "session_user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            window.location.reload();
+          }}>
+            <LogOut size={14} /> 로그아웃
+          </button>
+        </div>
+      ) : (
+        <div className="auth-footer">
+          <button onClick={() => setShowAuthModal(true)} className="btn-outline">로그인 / 회원가입</button>
+        </div>
+      )}
+
+      {/* User's Current Reservations List (Bottom) */}
+      {user && reservations.filter(r => r.userId === user.id).length > 0 && (
+        <div className="reservations-section">
+          <h3 className="sub-header">내 예약 내역</h3>
+          <div className="reservation-grid">
+            {reservations
+              .filter(r => r.userId === user.id)
+              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+              .map((r) => (
+                <div key={r.id} className="res-card">
+                  <div className="res-card-info">
+                    <div className="res-card-date">{r.date}</div>
+                    <div className="res-card-time">{r.timeSlot}</div>
+                  </div>
+                  <button
+                    className="delete-btn"
+                    onClick={async () => {
+                      if (!confirm("정말 취소하시겠습니까?")) return;
+                      await fetch("/api/reservations", {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: r.id })
+                      });
+                      fetchReservations();
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+          </div>
+        </div>
       )}
 
       {showAuthModal && (
@@ -214,236 +324,213 @@ export default function Home() {
       )}
 
       <style jsx>{`
-        .grid-container {
+        .main-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 32px;
-          margin-bottom: 24px;
+          gap: 40px;
+          align-items: start;
         }
-
         @media (max-width: 768px) {
-          .grid-container {
+          .main-grid {
             grid-template-columns: 1fr;
           }
         }
-
-        .section-title {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 16px;
-          color: var(--text-main);
-        }
-
-        .section-title h4 {
-          font-size: 16px;
-          font-weight: 600;
-        }
-
-        .selection-info {
-          margin-top: 24px;
-        }
-
-        .info-box {
-          background: #f8fafc;
-          border: 1px solid var(--border-color);
-          border-radius: 12px;
-          padding: 16px;
-          text-align: center;
-        }
-
-        .info-label {
-          font-size: 12px;
-          color: var(--text-muted);
-          margin-bottom: 4px;
-        }
-
-        .info-value {
-          font-size: 18px;
-          font-weight: 700;
-          color: var(--primary);
-        }
-
-        .info-sub {
-          font-size: 12px;
-          color: #64748b;
-          margin-top: 4px;
-        }
-
-        .rules-card {
-          background: #fff;
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-lg);
-          padding: 24px;
-          margin-bottom: 32px;
-        }
-
-        .rules-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 16px;
-          color: #1e293b;
-        }
-
-        .rules-header h4 {
-          font-weight: 700;
-        }
-
-        .rules-card ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-        }
-
-        .rules-card li {
-          font-size: 14px;
-          color: #475569;
-          margin-bottom: 8px;
-          padding-left: 20px;
-          position: relative;
-        }
-
-        .rules-card li::before {
-          content: "•";
-          position: absolute;
-          left: 0;
-          color: var(--primary);
-          font-weight: bold;
-        }
-
-        .action-area {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 16px;
-          margin-bottom: 40px;
-        }
-
-        .btn-group {
-          display: flex;
-          gap: 12px;
-          width: 100%;
-          max-width: 400px;
-        }
-
-        .reservation-btn {
-          flex: 2;
-          height: 48px;
-          font-size: 16px;
-          font-weight: 600;
-        }
-
-        .btn-outline {
-          flex: 1;
-          height: 48px;
-          background: white;
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-md);
-          color: var(--text-muted);
-          font-weight: 500;
-          transition: all 0.2s;
-        }
-
-        .btn-outline:hover {
-          background: #f8fafc;
-          border-color: #cbd5e1;
-          color: var(--text-main);
-        }
-
-        .user-status {
-          margin-top: 24px;
-          padding: 12px;
-          background: #f8fafc;
-          border-radius: var(--radius-md);
-          font-size: 13px;
-          color: var(--text-muted);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-        }
-
-        .btn-logout {
-          background: none;
-          border: none;
-          color: #ef4444;
-          font-size: 12px;
-          text-decoration: underline;
-          cursor: pointer;
-          padding: 0;
-        }
-
-        .my-reservations {
-          margin-top: 40px;
-          padding-top: 32px;
-          border-top: 1px solid var(--border-color);
-          width: 100%;
-        }
-
-        .section-header {
-          font-size: 18px;
-          font-weight: 700;
-          margin-bottom: 16px;
-          color: var(--text-main);
-        }
-
-        .reservation-list {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 12px;
-        }
-
-        .reservation-item {
-          background: white;
-          border: 1px solid var(--border-color);
-          border-radius: 12px;
-          padding: 16px;
+        .section-header-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          transition: transform 0.2s, box-shadow 0.2s;
+          margin-bottom: 20px;
         }
-
-        .reservation-item:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        .btn-today-header {
+          background: #0f172a;
+          color: white;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 14px;
+          font-weight: 700;
         }
-
-        .res-info {
+        .btn-today-header:hover {
+          background: #334155;
+        }
+        .date-info-card {
+          margin-top: 24px;
+          padding: 24px;
+          background: #f8fafc;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+        }
+        .date-info-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+        .date-display-text {
+          font-size: 16px;
+          color: var(--text-main);
+        }
+        .date-sub-text {
+          font-size: 14px;
+          color: var(--text-muted);
+        }
+        .user-info-section {
+          margin-top: 32px;
+        }
+        .premium-input {
+          height: 52px;
+        }
+        .input-hint {
+          font-size: 12px;
+          color: var(--text-muted);
+          margin-top: 8px;
+          line-height: 1.4;
+        }
+        .summary-box {
+          margin-top: 32px;
+          background: #f8fafc;
+          border-radius: 16px;
+          padding: 32px;
+        }
+        .summary-title {
+          font-weight: 800;
+          font-size: 16px;
+          margin-bottom: 24px;
+          color: var(--text-main);
+        }
+        .summary-content {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 16px;
         }
-
-        .res-date {
-          font-size: 14px;
+        .summary-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 15px;
+        }
+        .item-left {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--text-muted);
+        }
+        .item-right {
           font-weight: 600;
           color: var(--text-main);
         }
-
-        .res-time {
+        .guide-card {
+           background: #fffdf2;
+           border-color: #fef3c7;
+        }
+        .guide-list {
+          list-style: none;
+          padding: 0;
+          margin-top: 16px;
+        }
+        .guide-list li {
+          font-size: 14px;
+          color: #92400e;
+          margin-bottom: 12px;
+          padding-left: 20px;
+          position: relative;
+          line-height: 1.6;
+        }
+        .guide-list li::before {
+          content: "•";
+          position: absolute;
+          left: 0;
+          font-weight: bold;
+        }
+        .footer-actions {
+          display: flex;
+          gap: 16px;
+          margin-bottom: 60px;
+        }
+        .confirm-btn {
+          flex: 5;
+          height: 60px;
+          font-size: 18px;
+          border-radius: 12px;
+        }
+        .reset-btn {
+          flex: 1;
+          height: 60px;
+          font-size: 16px;
+          border-radius: 12px;
+          color: var(--text-muted);
+        }
+        .my-status {
+          display: flex;
+          justify-content: space-between;
+          padding: 16px 24px;
+          background: white;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-sm);
+          margin-bottom: 40px;
+        }
+        .user-profile {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+        }
+        .logout-link {
+          background: none;
+          color: var(--text-muted);
           font-size: 13px;
-          color: var(--primary);
           font-weight: 500;
         }
-
-        .btn-cancel {
-          background: #fee2e2;
-          color: #ef4444;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.2s;
+        .logout-link:hover {
+          color: var(--danger);
         }
-
-        .btn-cancel:hover {
-          background: #fecaca;
+        .auth-footer {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 40px;
+        }
+        .sub-header {
+           font-size: 20px;
+           font-weight: 700;
+           margin-bottom: 24px;
+        }
+        .reservation-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+           gap: 20px;
+        }
+        .res-card {
+           background: white;
+           padding: 24px;
+           border-radius: 16px;
+           border: 1px solid var(--border);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           box-shadow: var(--shadow-sm);
+        }
+        .res-card-date {
+           font-weight: 800;
+           font-size: 16px;
+        }
+        .res-card-time {
+           font-size: 14px;
+           color: var(--accent);
+           margin-top: 4px;
+           font-weight: 600;
+        }
+        .delete-btn {
+           color: #94a3b8;
+           background: none;
+           padding: 10px;
+           border-radius: 12px;
+           transition: all 0.2s;
+        }
+        .delete-btn:hover {
+           color: var(--danger);
+           background: #fff1f2;
         }
       `}</style>
     </main>
   );
 }
+

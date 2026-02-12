@@ -1,32 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-// 사용자 정보 (임시 로그인 아이디 기반)
 model User {
   id           String        @id @default(uuid())
-  username     String        @unique // 로그인 아이디 (임시)
-  password     String        // 비밀번호 (암호화 저장)
-  name         String?       // 사용자 이름
-  reservations Reservation[]
+  username     String        @unique
+  password     String
+  name         String?
+  discordId    String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  reservations Reservation[]
 }
 
-// 예약 정보
 model Reservation {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  date      String   // 예약 날짜 (YYYY-MM-DD 형식)
-  timeSlot  String   // 예약 시간대 (예: "19:00-22:00")
-  status    String   @default("CONFIRMED") // CONFIRMED, CANCELLED
+  date      String
+  timeSlot  String
+  status    String   @default("CONFIRMED")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([date, timeSlot]) // 같은 날짜, 같은 시간대에 중복 예약 방지
+  @@unique([date, timeSlot])
 }
