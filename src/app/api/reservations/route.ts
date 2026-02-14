@@ -132,8 +132,7 @@ export async function DELETE(req: Request) {
             );
         }
 
-        const { searchParams } = new URL(req.url);
-        const reservationId = searchParams.get("id");
+        const { id: reservationId } = await req.json();
 
         if (!reservationId) {
             return NextResponse.json(
