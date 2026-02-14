@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { isHoliday } from "@/utils/timeSlots";
 
 interface CalendarProps {
   onSelectDate: (date: string) => void;
@@ -84,12 +85,11 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
         ))}
 
         {days.map((item) => {
-          const dateObj = new Date(item.year, item.month, item.day);
-          const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
-          const isSelected = selectedDate === dateStr;
-          const isToday = dateObj.toDateString() === today.toDateString();
-          const isPast = dateObj < today;
-          const dayOfWeek = dateObj.getDay();
+          const isHolidayDate = isHoliday(dateStr);
+
+          // 일요일이거나 공휴일이면 빨간색 (sun 클래스)
+          const isRedDay = dayOfWeek === 0 || isHolidayDate;
+          const isBlueDay = dayOfWeek === 6 && !isHolidayDate; // 토요일은 공휴일 아니면 파란색
 
           return (
             <div
@@ -97,7 +97,7 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
               className={`day-cell ${item.faded ? "faded" : ""} ${isSelected ? "selected" : ""} ${isToday ? "today" : ""} ${isPast && !item.faded ? "past" : ""}`}
               onClick={() => !isPast && !item.faded && onSelectDate(dateStr)}
             >
-              <div className={`day-number ${dayOfWeek === 0 ? "sun" : dayOfWeek === 6 ? "sat" : ""}`}>
+              <div className={`day-number ${isRedDay ? "sun" : isBlueDay ? "sat" : ""}`}>
                 {item.day}
               </div>
               {isToday && <div className="today-dot" />}
