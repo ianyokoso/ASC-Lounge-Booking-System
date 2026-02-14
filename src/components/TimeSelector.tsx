@@ -111,20 +111,20 @@ export default function TimeSelector({
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .time-card.selected {
-          border-color: #0f172a;
-          background: #0f172a;
+          border-color: #1e293b;
+          background: #1e293b; /* Deep Navy */
           color: white;
-          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+          box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25);
           transform: scale(1.02);
         }
         .time-card.disabled {
-          background: #f1f5f9;
+          background: #f8fafc;
           color: #cbd5e1;
           cursor: not-allowed;
           border-color: #f1f5f9;
         }
         .time-card.loading {
-          background: #f1f5f9;
+          background: #f8fafc;
           color: #94a3b8;
           cursor: wait;
           border-color: #e2e8f0;

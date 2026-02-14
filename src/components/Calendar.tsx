@@ -119,6 +119,7 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
           border-radius: 16px;
           padding: 24px;
           user-select: none;
+          box-shadow: 0 4px 6px -2px rgba(0,0,0,0.03);
         }
         .calendar-nav-row {
           display: flex;
@@ -128,8 +129,8 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
           padding: 0 4px;
         }
         .nav-icon-btn {
-          background: #f8fafc;
-          border: 1px solid #f1f5f9;
+          background: white;
+          border: 1px solid #e2e8f0;
           width: 36px;
           height: 36px;
           border-radius: 10px;
@@ -140,13 +141,14 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
           transition: all 0.2s;
         }
         .nav-icon-btn:hover {
-          background: #f1f5f9;
-          color: #0f172a;
+          background: #f8fafc;
+          border-color: #cbd5e1;
+          color: #1e293b;
         }
         .nav-title {
           font-size: 18px;
           font-weight: 800;
-          color: #0f172a;
+          color: #1e293b;
           letter-spacing: -0.02em;
         }
         .calendar-grid {
@@ -156,10 +158,11 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
         }
         .weekday-label {
           text-align: center;
-          font-size: 13px;
-          font-weight: 700;
-          color: #64748b;
+          font-size: 12px;
+          font-weight: 600;
+          color: #94a3b8;
           padding: 12px 0;
+          text-transform: uppercase;
         }
         .weekday-label.sun { color: #f43f5e; }
         .weekday-label.sat { color: #3b82f6; }
@@ -171,13 +174,13 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          border-radius: 12px;
+          border-radius: 50%; /* Circle shape as requested */
           position: relative;
           transition: all 0.2s;
         }
         .day-number {
           font-size: 15px;
-          font-weight: 600;
+          font-weight: 500;
           color: #334155;
         }
         .day-number.sun { color: #f43f5e; }
@@ -198,27 +201,29 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
         }
 
         .day-cell.today {
-          background: #f1f5f9;
+          background: #f8fafc;
           border: 1px solid #e2e8f0;
         }
         .day-cell.today .day-number {
-          color: #0f172a;
+          font-weight: 700;
+          color: #1e293b;
         }
         .today-dot {
           width: 4px;
           height: 4px;
-          background: #0f172a;
+          background: #1e293b;
           border-radius: 50%;
           position: absolute;
-          bottom: 10px;
+          bottom: 8px;
         }
 
         .day-cell.selected {
-          background: #0f172a;
-          border-color: #0f172a;
+          background: #1e293b; /* Deep Navy selected state */
+          border-color: #1e293b;
         }
         .day-cell.selected .day-number {
-          color: white;
+          color: white; /* White text on active */
+          font-weight: 600;
         }
         .day-cell.selected .today-dot {
           background: white;
