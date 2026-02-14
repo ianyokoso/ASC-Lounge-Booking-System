@@ -450,6 +450,16 @@ export default function AdminPage() {
                 }
                 .empty-state-box p { font-size: 16px; font-weight: 700; color: #1e293b; margin: 0; }
                 
+                .holiday-dot {
+                    width: 5px;
+                    height: 5px;
+                    background-color: #ef4444;
+                    border-radius: 50%;
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                }
+
                 @media (max-width: 1024px) {
                     .stats-row, .slots-grid { grid-template-columns: repeat(2, 1fr); }
                 }
