@@ -205,6 +205,7 @@ export default function Home() {
             selectedSlot={selectedSlot}
             onSelectSlot={setSelectedSlot}
             disabledSlots={disabledSlots}
+            isLoading={initialLoading}
           />
 
           <div className="user-info-section">
