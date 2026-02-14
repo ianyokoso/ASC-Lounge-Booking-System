@@ -24,9 +24,39 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-      </body>
-    </html>
+      <nav style={{
+        height: '60px',
+        background: 'white',
+        borderBottom: '1px solid #e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 20px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {/* Logo Placeholder - Text for now, User can replace with Image */}
+          <div style={{
+            backgroundColor: '#1e293b',
+            color: 'white',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            fontWeight: 'bold',
+            fontSize: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>ASC</div>
+        </div>
+        <div style={{ display: 'flex', gap: '24px', fontSize: '14px', fontWeight: '600', color: '#334155' }}>
+          <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>예약하기</a>
+          <a href="/admin" style={{ textDecoration: 'none', color: 'inherit', padding: '6px 12px', background: '#f1f5f9', borderRadius: '6px' }}>전체예약현황보기</a>
+        </div>
+      </nav>
+      {children}
+    </body>
+    </html >
   );
 }
