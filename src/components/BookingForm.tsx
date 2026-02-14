@@ -299,9 +299,17 @@ export default function BookingForm({
                     </div>
                     <button
                         className="logout-link"
-                        onClick={() => {
-                            document.cookie = "session_user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                            window.location.reload();
+                        onClick={async () => {
+                            try {
+                                const res = await fetch("/api/auth/logout", {
+                                    method: "POST",
+                                });
+                                if (res.ok) {
+                                    window.location.reload();
+                                }
+                            } catch (error) {
+                                console.error("Logout failed", error);
+                            }
                         }}
                     >
                         <LogOut size={14} /> 로그아웃
