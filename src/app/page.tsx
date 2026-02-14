@@ -60,38 +60,12 @@ export default async function Home() {
   const { user, availabilityMap, myReservations } = await getInitialData();
 
   return (
-    <main className="container">
-      <header className="heading-container">
-        <h1>라운지 예약하기</h1>
-        <p>원하는 날짜와 시간을 선택해주세요</p>
-      </header>
-
+    <main style={{ minHeight: "100vh", backgroundColor: "#f8fafc", paddingBottom: "80px" }}>
       <BookingForm
         initialAvailability={availabilityMap}
         initialUser={user}
         initialReservations={myReservations}
       />
-
-      <div className="card guide-card">
-        <div className="section-title">
-          <Info size={18} />
-          <h4>예약 안내</h4>
-        </div>
-        <ul className="guide-list">
-          <li>
-            <strong>새로운 정책:</strong> 예약은 3시간 단위로 가능합니다
-          </li>
-          <li>
-            <strong>권장사항:</strong> 다른 회원들을 위해 일주일에 한 번 정도 이용을 권장합니다
-          </li>
-          <li>평일은 저녁 7시부터, 주말은 제한 없이 이용 가능합니다</li>
-          <li>1인당 하루 최대 3시간까지 예약 가능합니다</li>
-          <li>예약 취소는 이용 1시간 전까지 가능합니다</li>
-          <li>예약 완료 시 즉시 확정되며 디스코드 DM으로 알림이 발송됩니다</li>
-        </ul>
-      </div>
-
-
     </main>
   );
 }
