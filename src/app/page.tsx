@@ -29,12 +29,14 @@ export default function Home() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
   const fetchReservations = async () => {
     try {
       const res = await fetch("/api/reservations");
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setReservations(data);
+      if (Array.isArray(data.reservations)) {
+        setReservations(data.reservations);
       } else {
         setReservations([]);
       }
@@ -43,9 +45,32 @@ export default function Home() {
     }
   };
 
+  const fetchAvailability = async (date: string) => {
+    if (!date) return;
+    try {
+      const res = await fetch(`/api/availability?date=${date}`);
+      const data = await res.json();
+      if (data.timeSlots) {
+        setBookedSlots(data.timeSlots);
+      } else {
+        setBookedSlots([]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch availability", err);
+    }
+  };
+
   useEffect(() => {
     fetchReservations();
   }, []);
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchAvailability(selectedDate);
+    } else {
+      setBookedSlots([]);
+    }
+  }, [selectedDate, reservations]); // reservations 변경 시(내가 예약/취소 시)에도 반영
 
   useEffect(() => {
     if (user) {
@@ -54,11 +79,7 @@ export default function Home() {
     }
   }, [user]);
 
-  const disabledSlots = Array.isArray(reservations)
-    ? reservations
-      .filter((r) => r.date === selectedDate && r.status === "CONFIRMED")
-      .map((r) => r.timeSlot)
-    : [];
+  const disabledSlots = bookedSlots;
 
   const isWeekend = (dateStr: string) => {
     if (!dateStr) return false;
