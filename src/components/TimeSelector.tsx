@@ -91,6 +91,19 @@ export default function TimeSelector({ onSelectSlot, selectedSlot, disabledSlots
           cursor: not-allowed;
           border-color: #f1f5f9;
         }
+        .time-card.loading {
+          background: #f1f5f9;
+          color: #94a3b8;
+          cursor: wait;
+          border-color: #e2e8f0;
+          opacity: 0.8;
+          animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+          0% { opacity: 0.8; }
+          50% { opacity: 0.5; }
+          100% { opacity: 0.8; }
+        }
         .time-range {
           font-weight: 700;
           font-size: 16px;
