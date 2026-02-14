@@ -6,16 +6,32 @@ interface TimeSelectorProps {
   onSelectSlot: (slot: string) => void;
   selectedSlot: string;
   disabledSlots: string[];
+  availableSlots: string[];
   isLoading?: boolean;
 }
 
-const SLOTS = [
-  "19:00-22:00",
-  "20:00-23:00",
-  "21:00-24:00"
-];
+export default function TimeSelector({
+  onSelectSlot,
+  selectedSlot,
+  disabledSlots,
+  availableSlots = [],
+  isLoading = false
+}: TimeSelectorProps) {
+  // 슬롯이 없을 때의 표시 로직 추가 (선택적)
+  if (availableSlots.length === 0 && !isLoading) {
+    return (
+      <div className="time-selector-container">
+        <div className="section-title">
+          <Clock size={20} />
+          <h4>시간 선택</h4>
+        </div>
+        <div className="empty-slots">
+          날짜를 먼저 선택해주세요.
+        </div>
+      </div>
+    );
+  }
 
-export default function TimeSelector({ onSelectSlot, selectedSlot, disabledSlots, isLoading = false }: TimeSelectorProps) {
   return (
     <div className="time-selector-container">
       <div className="section-title">
@@ -23,7 +39,7 @@ export default function TimeSelector({ onSelectSlot, selectedSlot, disabledSlots
         <h4>시간 선택</h4>
       </div>
       <div className="time-cards-grid">
-        {SLOTS.map((slot) => {
+        {availableSlots.map((slot) => {
           const isDisabled = disabledSlots.includes(slot) || isLoading;
           const isSelected = selectedSlot === slot;
 
