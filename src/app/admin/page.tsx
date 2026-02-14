@@ -75,7 +75,7 @@ export default function AdminPage() {
 
     // Data Processing for Selected Date
     const getDailyStats = (dateStr: string) => {
-        if (!dateStr) return { total: 0, booked: 0, available: 0 };
+        if (!dateStr) return { total: 0, booked: 0, available: 0, slots: [] };
         const totalSlots = getSlotsForDate(dateStr);
         const booked = reservations.filter(r => r.date === dateStr);
         return {
