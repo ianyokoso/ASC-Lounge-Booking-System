@@ -92,10 +92,19 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
             <header className="dashboard-header">
                 <div className="header-left">
                     <Link href="/" className="back-btn">
-                        <img src="/asc-logo.svg" alt="ASC Logo" style={{ height: '40px', marginRight: '16px' }} />
+                        <img
+                            src="/asc-logo.svg"
+                            alt="ASC Logo"
+                            style={{
+                                height: '50px',
+                                width: '50px',
+                                objectFit: 'contain',
+                                marginRight: '20px'
+                            }}
+                        />
                         <ArrowLeft size={24} />
                     </Link>
-                    <h1 style={{ fontSize: '28px', fontWeight: '800' }}>예약 현황</h1>
+                    <h1 style={{ fontSize: '28px', fontWeight: '800', marginLeft: '12px' }}>예약 현황</h1>
                 </div>
                 <button onClick={goToToday} className="btn-today">오늘</button>
             </header>
