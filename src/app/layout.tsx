@@ -41,26 +41,29 @@ export default function RootLayout({
             display: 'flex',
             alignItems: 'center',
             height: '100%',
-            flexShrink: 0
+            flexShrink: 0,
+            marginRight: '20px'
           }}>
             <img
               src="/asc-logo.svg"
               alt="ASC Logo"
               style={{
-                height: '60px',
-                width: '60px',
-                minHeight: '60px',
-                minWidth: '60px',
+                height: '64px',
+                width: '64px',
+                minHeight: '64px',
+                minWidth: '64px',
                 objectFit: 'contain',
-                display: 'block'
+                display: 'block',
+                borderRadius: '8px'
               }}
             />
           </div>
           <div style={{
             display: 'flex',
-            gap: '32px',
+            gap: '24px',
             alignItems: 'center',
-            height: '100%'
+            height: '100%',
+            flexShrink: 0
           }}>
             <a href="/" style={{
               textDecoration: 'none',
@@ -68,7 +71,10 @@ export default function RootLayout({
               fontSize: '15px',
               fontWeight: '700',
               display: 'flex',
-              alignItems: 'center'
+              alignItems: 'center',
+              padding: '10px 16px',
+              border: '1px solid transparent', // Match the other item's box model
+              lineHeight: '1'
             }}>예약하기</a>
             <a href="/admin" style={{
               textDecoration: 'none',
@@ -82,7 +88,9 @@ export default function RootLayout({
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'all 0.2s',
-              border: '1px solid #dbeafe'
+              border: '1px solid #dbeafe',
+              lineHeight: '1',
+              boxShadow: '0 2px 4px rgba(59, 130, 246, 0.05)'
             }}>전체예약현황보기</a>
           </div>
         </nav>
