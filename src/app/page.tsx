@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Calendar from "@/components/Calendar";
 import TimeSelector from "@/components/TimeSelector";
 import AuthModal from "@/components/AuthModal";
