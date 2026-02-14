@@ -6,6 +6,7 @@ interface TimeSelectorProps {
   onSelectSlot: (slot: string) => void;
   selectedSlot: string;
   disabledSlots: string[];
+  isLoading?: boolean;
 }
 
 const SLOTS = [
@@ -14,7 +15,7 @@ const SLOTS = [
   "21:00-24:00"
 ];
 
-export default function TimeSelector({ onSelectSlot, selectedSlot, disabledSlots }: TimeSelectorProps) {
+export default function TimeSelector({ onSelectSlot, selectedSlot, disabledSlots, isLoading = false }: TimeSelectorProps) {
   return (
     <div className="time-selector-container">
       <div className="section-title">
@@ -23,17 +24,25 @@ export default function TimeSelector({ onSelectSlot, selectedSlot, disabledSlots
       </div>
       <div className="time-cards-grid">
         {SLOTS.map((slot) => {
-          const isDisabled = disabledSlots.includes(slot);
+          const isDisabled = disabledSlots.includes(slot) || isLoading;
           const isSelected = selectedSlot === slot;
 
           return (
             <div
               key={slot}
-              className={`time-card ${isSelected ? "selected" : ""} ${isDisabled ? "disabled" : ""}`}
+              className={`time-card ${isSelected ? "selected" : ""} ${isDisabled ? "disabled" : ""} ${isLoading ? "loading" : ""}`}
               onClick={() => !isDisabled && onSelectSlot(slot)}
             >
               <div className="time-range">{slot}</div>
-              <div className="status-label">{isDisabled ? "예약 불가" : "예약 가능"}</div>
+              <div className="status-label">
+                {isLoading ? (
+                  "확인 중..."
+                ) : isDisabled ? (
+                  disabledSlots.includes(slot) ? "예약 불가" : "선택 불가"
+                ) : (
+                  "예약 가능"
+                )}
+              </div>
             </div>
           );
         })}

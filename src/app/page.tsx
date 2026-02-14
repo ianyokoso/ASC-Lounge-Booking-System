@@ -30,6 +30,8 @@ export default function Home() {
   const [success, setSuccess] = useState("");
 
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const [isAvailabilityLoading, setIsAvailabilityLoading] = useState(false);
+  const availabilityCache = useRef<Record<string, string[]>>({});
 
   const fetchReservations = async () => {
     try {
@@ -47,16 +49,30 @@ export default function Home() {
 
   const fetchAvailability = async (date: string) => {
     if (!date) return;
+
+    // 캐시 확인
+    if (availabilityCache.current[date]) {
+      setBookedSlots(availabilityCache.current[date]);
+      return;
+    }
+
+    setIsAvailabilityLoading(true);
+    setBookedSlots([]); // 로딩 중에는 선택 불가하도록 초기화 (또는 이전 상태 유지)
+
     try {
       const res = await fetch(`/api/availability?date=${date}`);
       const data = await res.json();
       if (data.timeSlots) {
         setBookedSlots(data.timeSlots);
+        availabilityCache.current[date] = data.timeSlots; // 캐시 저장
       } else {
         setBookedSlots([]);
+        availabilityCache.current[date] = [];
       }
     } catch (err) {
       console.error("Failed to fetch availability", err);
+    } finally {
+      setIsAvailabilityLoading(false);
     }
   };
 
@@ -200,6 +216,7 @@ export default function Home() {
             selectedSlot={selectedSlot}
             onSelectSlot={setSelectedSlot}
             disabledSlots={disabledSlots}
+            isLoading={isAvailabilityLoading}
           />
 
           <div className="user-info-section">
