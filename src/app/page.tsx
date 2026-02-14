@@ -28,10 +28,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [allAvailability, setAllAvailability] = useState<Record<string, string[]>>({});
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
-  const [isAvailabilityLoading, setIsAvailabilityLoading] = useState(false);
-  const availabilityCache = useRef<Record<string, string[]>>({});
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]); // This will now be derived from allAvailability
 
   const fetchReservations = async () => {
     try {
@@ -47,46 +47,35 @@ export default function Home() {
     }
   };
 
-  const fetchAvailability = async (date: string) => {
-    if (!date) return;
-
-    // 캐시 확인
-    if (availabilityCache.current[date]) {
-      setBookedSlots(availabilityCache.current[date]);
-      return;
-    }
-
-    setIsAvailabilityLoading(true);
-    setBookedSlots([]); // 로딩 중에는 선택 불가하도록 초기화 (또는 이전 상태 유지)
-
+  const fetchAllAvailability = async () => {
     try {
-      const res = await fetch(`/api/availability?date=${date}`);
+      // 날짜 파라미터 없이 호출하면 전체 데이터 반환
+      const res = await fetch(`/api/availability`);
       const data = await res.json();
-      if (data.timeSlots) {
-        setBookedSlots(data.timeSlots);
-        availabilityCache.current[date] = data.timeSlots; // 캐시 저장
-      } else {
-        setBookedSlots([]);
-        availabilityCache.current[date] = [];
+      if (data.availabilityMap) {
+        setAllAvailability(data.availabilityMap);
       }
     } catch (err) {
       console.error("Failed to fetch availability", err);
     } finally {
-      setIsAvailabilityLoading(false);
+      setInitialLoading(false);
     }
   };
 
   useEffect(() => {
     fetchReservations();
-  }, []);
+    fetchAllAvailability();
+  }, []); // 마운트 시 한 번만 실행
 
+  // 선택된 날짜가 변경되면 로컬 데이터에서 즉시 조회 (네트워크 요청 없음)
   useEffect(() => {
     if (selectedDate) {
-      fetchAvailability(selectedDate);
+      const slots = allAvailability[selectedDate] || [];
+      setBookedSlots(slots);
     } else {
       setBookedSlots([]);
     }
-  }, [selectedDate, reservations]); // reservations 변경 시(내가 예약/취소 시)에도 반영
+  }, [selectedDate, allAvailability]);
 
   useEffect(() => {
     if (user) {
@@ -216,7 +205,6 @@ export default function Home() {
             selectedSlot={selectedSlot}
             onSelectSlot={setSelectedSlot}
             disabledSlots={disabledSlots}
-            isLoading={isAvailabilityLoading}
           />
 
           <div className="user-info-section">
