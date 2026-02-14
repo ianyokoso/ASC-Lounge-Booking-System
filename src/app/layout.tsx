@@ -38,7 +38,7 @@ export default function RootLayout({
           zIndex: 1000
         }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/asc-logo.svg" alt="ASC Logo" style={{ height: '40px' }} />
+            <img src="/asc-logo.svg" alt="ASC Logo" style={{ height: '50px' }} />
           </div>
           <div style={{ display: 'flex', gap: '24px', fontSize: '14px', fontWeight: '600', color: '#334155' }}>
             <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>예약하기</a>

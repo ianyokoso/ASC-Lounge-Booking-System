@@ -92,10 +92,10 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
             <header className="dashboard-header">
                 <div className="header-left">
                     <Link href="/" className="back-btn">
-                        <img src="/asc-logo.svg" alt="ASC Logo" style={{ height: '32px', marginRight: '12px' }} />
-                        <ArrowLeft size={20} />
+                        <img src="/asc-logo.svg" alt="ASC Logo" style={{ height: '40px', marginRight: '16px' }} />
+                        <ArrowLeft size={24} />
                     </Link>
-                    <h1>예약 현황</h1>
+                    <h1 style={{ fontSize: '28px', fontWeight: '800' }}>예약 현황</h1>
                 </div>
                 <button onClick={goToToday} className="btn-today">오늘</button>
             </header>
@@ -146,19 +146,31 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
             {/* Stats Row */}
             <section className="stats-row">
                 <div className="stat-card">
-                    <div className="stat-label">전체 슬롯</div>
-                    <div className="stat-value">{dailyStats.total}</div>
-                    <CalendarIcon className="stat-icon" />
+                    <div className="stat-content">
+                        <div className="stat-label">전체 슬롯</div>
+                        <div className="stat-value">{dailyStats.total}</div>
+                    </div>
+                    <div className="stat-icon-wrapper gray">
+                        <CalendarIcon size={24} />
+                    </div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-label">예약 확정</div>
-                    <div className="stat-value text-green">{dailyStats.booked}</div>
-                    <CheckCircle2 className="stat-icon text-green" />
+                    <div className="stat-content">
+                        <div className="stat-label">예약 확정</div>
+                        <div className="stat-value text-green">{dailyStats.booked}</div>
+                    </div>
+                    <div className="stat-icon-wrapper green">
+                        <CheckCircle2 size={24} />
+                    </div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-label">예약 가능</div>
-                    <div className="stat-value text-blue">{dailyStats.available}</div>
-                    <TrendingUp className="stat-icon text-blue" />
+                    <div className="stat-content">
+                        <div className="stat-label">예약 가능</div>
+                        <div className="stat-value text-blue">{dailyStats.available}</div>
+                    </div>
+                    <div className="stat-icon-wrapper blue">
+                        <TrendingUp size={24} />
+                    </div>
                 </div>
             </section>
 
