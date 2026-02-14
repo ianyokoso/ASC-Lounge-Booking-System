@@ -1,0 +1,22 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#fdfbf7"/>
+  
+  <!-- Definitions for the curve/hill -->
+  <defs>
+    <clipPath id="hill-clip">
+      <path d="M0,130 Q100,80 200,130 V200 H0 Z" />
+    </clipPath>
+  </defs>
+
+  <!-- Top Layer: Dark Blue Text -->
+  <text x="50%" y="150" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="120" text-anchor="middle" fill="#1e293b" letter-spacing="-5">ASC</text>
+
+  <!-- Bottom Layer: Dark Blue Hill -->
+  <path d="M0,130 Q100,80 200,130 V200 H0 Z" fill="#1e293b"/>
+
+  <!-- Overlay Layer: Cream Text clipped to the Hill -->
+  <g clip-path="url(#hill-clip)">
+    <text x="50%" y="150" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="120" text-anchor="middle" fill="#fdfbf7" letter-spacing="-5">ASC</text>
+  </g>
+</svg>
