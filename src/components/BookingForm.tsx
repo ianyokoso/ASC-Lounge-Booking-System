@@ -16,7 +16,7 @@ import {
   Trash2,
   LogOut,
 } from "lucide-react";
-import { getSlotsForDate, isWeekendOrHoliday } from "@/utils/timeSlots";
+import { getSlotsForDate, isWeekendOrHoliday, isHoliday } from "@/utils/timeSlots";
 
 interface BookingFormProps {
   initialAvailability: Record<string, string[]>;
