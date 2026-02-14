@@ -1,20 +1,42 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Calendar from "@/components/Calendar";
+import TimeSelector from "@/components/TimeSelector";
+import AuthModal from "@/components/AuthModal";
+import {
+  AlertCircle,
+  Calendar as CalendarIcon,
+  User as UserIcon,
+  Clock,
+  CheckCircle2,
+  Info,
+  Layout,
+  Loader2,
+  Trash2,
+  LogOut,
+} from "lucide-react";
 import { getSlotsForDate, isWeekendOrHoliday } from "@/utils/timeSlots";
 
-// ... (previous imports)
+interface BookingFormProps {
+  initialAvailability: Record<string, string[]>;
+  initialUser: any; // 서버에서 받은 유저 정보 (쿠키 기반)
+  initialReservations: any[]; // 초기 예약 목록
+}
 
 export default function BookingForm({
-    initialAvailability,
-    initialUser,
-    initialReservations,
+  initialAvailability,
+  initialUser,
+  initialReservations,
 }: BookingFormProps) {
-    // ... (state)
+  // ... (state)
 
-    // 동적 슬롯 계산
-    const availableTimeSlots = getSlotsForDate(selectedDate);
+  // 동적 슬롯 계산
+  const availableTimeSlots = getSlotsForDate(selectedDate);
 
-    // ... (effects)
+  // ... (effects)
 
-    const isWeekend = (dateStr: string) => isWeekendOrHoliday(dateStr);
+  const isWeekend = (dateStr: string) => isWeekendOrHoliday(dateStr);
 
     // ... (render)
 
@@ -78,8 +100,8 @@ export default function BookingForm({
                 </div>
             </div >
 
-        {/* 하단 액션 버튼 및 모달 등을 포함 */ }
-        < div className = "footer-actions" style = {{ gridColumn: "1 / -1", marginTop: "40px" }
+    {/* 하단 액션 버튼 및 모달 등을 포함 */ }
+    < div className = "footer-actions" style = {{ gridColumn: "1 / -1", marginTop: "40px" }
 }>
                 <button
                     className="btn-primary confirm-btn"
@@ -101,91 +123,91 @@ export default function BookingForm({
                 </button>
             </div >
 
-    <div className="version-info" style={{ gridColumn: "1 / -1", textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px' }}>
-        v1.3 (Server Component + Initial Data)
-    </div>
+  <div className="version-info" style={{ gridColumn: "1 / -1", textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px' }}>
+    v1.3 (Server Component + Initial Data)
+  </div>
 
 {
-    user ? (
-        <div className="my-status" style={{ gridColumn: "1 / -1" }}>
-            <div className="user-profile">
-                <Layout size={16} />
-                접속 중: <strong>{user.username}</strong>
-            </div>
-            <button
-                className="logout-link"
-                onClick={async () => {
-                    try {
-                        const res = await fetch("/api/auth/logout", {
-                            method: "POST",
-                        });
-                        if (res.ok) {
-                            window.location.reload();
-                        }
-                    } catch (error) {
-                        console.error("Logout failed", error);
-                    }
-                }}
-            >
-                <LogOut size={14} /> 로그아웃
-            </button>
-        </div>
-    ) : (
-        <div className="auth-footer" style={{ gridColumn: "1 / -1" }}>
-            <button onClick={() => setShowAuthModal(true)} className="btn-outline">
-                로그인 / 회원가입
-            </button>
-        </div>
-    )
+  user ? (
+    <div className="my-status" style={{ gridColumn: "1 / -1" }}>
+      <div className="user-profile">
+        <Layout size={16} />
+        접속 중: <strong>{user.username}</strong>
+      </div>
+      <button
+        className="logout-link"
+        onClick={async () => {
+          try {
+            const res = await fetch("/api/auth/logout", {
+              method: "POST",
+            });
+            if (res.ok) {
+              window.location.reload();
+            }
+          } catch (error) {
+            console.error("Logout failed", error);
+          }
+        }}
+      >
+        <LogOut size={14} /> 로그아웃
+      </button>
+    </div>
+  ) : (
+    <div className="auth-footer" style={{ gridColumn: "1 / -1" }}>
+      <button onClick={() => setShowAuthModal(true)} className="btn-outline">
+        로그인 / 회원가입
+      </button>
+    </div>
+  )
 }
 
 {/* 내 예약 목록 */ }
 {
-    user && reservations.filter((r) => r.userId === user.id).length > 0 && (
-        <div className="reservations-section" style={{ gridColumn: "1 / -1" }}>
-            <h3 className="sub-header">내 예약 내역</h3>
-            <div className="reservation-grid">
-                {reservations
-                    .filter((r) => r.userId === user.id)
-                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                    .map((r) => (
-                        <div key={r.id} className="res-card">
-                            <div className="res-card-info">
-                                <div className="res-card-date">{r.date}</div>
-                                <div className="res-card-time">{r.timeSlot}</div>
-                            </div>
-                            <button
-                                className="delete-btn"
-                                onClick={async () => {
-                                    if (!confirm("정말 취소하시겠습니까?")) return;
-                                    await fetch("/api/reservations", {
-                                        method: "DELETE",
-                                        headers: { "Content-Type": "application/json" },
-                                        body: JSON.stringify({ id: r.id }),
-                                    });
-                                    fetchReservations(); // 삭제 후 목록 갱신
-                                    fetchAllAvailability(); // 가용성 갱신
-                                }}
-                            >
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
-                    ))}
+  user && reservations.filter((r) => r.userId === user.id).length > 0 && (
+    <div className="reservations-section" style={{ gridColumn: "1 / -1" }}>
+      <h3 className="sub-header">내 예약 내역</h3>
+      <div className="reservation-grid">
+        {reservations
+          .filter((r) => r.userId === user.id)
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .map((r) => (
+            <div key={r.id} className="res-card">
+              <div className="res-card-info">
+                <div className="res-card-date">{r.date}</div>
+                <div className="res-card-time">{r.timeSlot}</div>
+              </div>
+              <button
+                className="delete-btn"
+                onClick={async () => {
+                  if (!confirm("정말 취소하시겠습니까?")) return;
+                  await fetch("/api/reservations", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: r.id }),
+                  });
+                  fetchReservations(); // 삭제 후 목록 갱신
+                  fetchAllAvailability(); // 가용성 갱신
+                }}
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
-        </div>
-    )
+          ))}
+      </div>
+    </div>
+  )
 }
 
 {
-    showAuthModal && (
-        <AuthModal
-            onSuccess={(u) => {
-                setUser(u);
-                setShowAuthModal(false);
-            }}
-            onClose={() => setShowAuthModal(false)}
-        />
-    )
+  showAuthModal && (
+    <AuthModal
+      onSuccess={(u) => {
+        setUser(u);
+        setShowAuthModal(false);
+      }}
+      onClose={() => setShowAuthModal(false)}
+    />
+  )
 }
 
 <style jsx>{`
