@@ -85,6 +85,12 @@ export default function Calendar({ onSelectDate, selectedDate }: CalendarProps) 
         ))}
 
         {days.map((item) => {
+          const dateObj = new Date(item.year, item.month, item.day);
+          const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
+          const isSelected = selectedDate === dateStr;
+          const isToday = dateObj.toDateString() === today.toDateString();
+          const isPast = dateObj < today;
+          const dayOfWeek = dateObj.getDay();
           const isHolidayDate = isHoliday(dateStr);
 
           // 일요일이거나 공휴일이면 빨간색 (sun 클래스)
