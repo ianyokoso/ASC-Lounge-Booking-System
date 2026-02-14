@@ -286,6 +286,10 @@ export default function Home() {
         </button>
       </div>
 
+      <div className="version-info" style={{ textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px' }}>
+        v1.2 (Zero Latency Applied)
+      </div>
+
       {user ? (
         <div className="my-status">
           <div className="user-profile">
