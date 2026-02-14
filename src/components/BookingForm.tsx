@@ -417,39 +417,54 @@ export default function BookingForm({
           color: var(--text-muted);
         }
         .user-info-section {
-          margin-top: 32px;
+          margin-top: 24px;
         }
         .premium-input {
-          height: 52px;
+          height: 48px;
+          border-radius: 12px;
+          border: 1px solid #e2e8f0;
+          padding: 0 16px;
+          font-size: 15px;
+          width: 100%;
+          transition: all 0.2s;
+        }
+        .premium-input:focus {
+            border-color: #0f172a;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
         }
         .input-hint {
           font-size: 12px;
           color: var(--text-muted);
-          margin-top: 8px;
+          margin-top: 6px;
           line-height: 1.4;
         }
         .summary-box {
-          margin-top: 32px;
+          margin-top: 24px;
           background: #f8fafc;
-          border-radius: 16px;
-          padding: 32px;
+          border-radius: 12px;
+          padding: 24px;
+          border: 1px solid #f1f5f9;
         }
         .summary-title {
-          font-weight: 800;
-          font-size: 16px;
-          margin-bottom: 24px;
+          font-weight: 700;
+          font-size: 15px;
+          margin-bottom: 20px;
           color: var(--text-main);
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
         .summary-content {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 12px;
         }
         .summary-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          font-size: 15px;
+          font-size: 14px;
         }
         .item-left {
           display: flex;
@@ -463,21 +478,28 @@ export default function BookingForm({
         }
         .footer-actions {
           display: flex;
-          gap: 16px;
-          margin-bottom: 60px;
+          gap: 12px;
+          margin-bottom: 40px;
         }
         .confirm-btn {
-          flex: 5;
-          height: 60px;
-          font-size: 18px;
+          flex: 4;
+          height: 56px;
+          font-size: 17px;
           border-radius: 12px;
+          font-weight: 700;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          transition: transform 0.1s;
+        }
+        .confirm-btn:active {
+            transform: scale(0.98);
         }
         .reset-btn {
           flex: 1;
-          height: 60px;
-          font-size: 16px;
+          height: 56px;
+          font-size: 15px;
           border-radius: 12px;
           color: var(--text-muted);
+          border: 1px solid #e2e8f0;
         }
         .my-status {
           display: flex;
