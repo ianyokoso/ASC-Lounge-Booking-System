@@ -29,188 +29,344 @@ export default function BookingForm({
   initialUser,
   initialReservations,
 }: BookingFormProps) {
-  // ... (state)
+  const [user, setUser] = useState<any>(initialUser);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState("");
+  const [name, setName] = useState("");
+  const [discordId, setDiscordId] = useState("");
+  const [reservations, setReservations] = useState<any[]>(initialReservations);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // 동적 슬롯 계산
+  // 서버에서 받은 초기 데이터로 상태 초기화
+  const [allAvailability, setAllAvailability] = useState<Record<string, string[]>>(initialAvailability);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
+  // 클라이언트 사이드에서 예약 목록 갱신 (예약 추가/삭제 시)
+  const fetchReservations = async () => {
+    try {
+      const res = await fetch("/api/reservations");
+      const data = await res.json();
+      if (Array.isArray(data.reservations)) {
+        setReservations(data.reservations);
+      } else {
+        setReservations([]);
+      }
+    } catch (err) {
+      setReservations([]);
+    }
+  };
+
+  // 클라이언트 사이드에서 가용성 정보 갱신 (필요 시)
+  const fetchAllAvailability = async () => {
+    try {
+      const res = await fetch(`/api/availability`);
+      const data = await res.json();
+      if (data.availabilityMap) {
+        setAllAvailability(data.availabilityMap);
+      }
+    } catch (err) {
+      console.error("Failed to fetch availability", err);
+    }
+  };
+
+  useEffect(() => {
+    // 선택된 날짜가 변경되면 로컬 데이터에서 조회
+    if (selectedDate) {
+      const slots = allAvailability[selectedDate] || [];
+      setBookedSlots(slots);
+    } else {
+      setBookedSlots([]);
+    }
+  }, [selectedDate, allAvailability]);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || user.username || "");
+      setDiscordId(user.discordId || "");
+    }
+  }, [user]);
+
+  const disabledSlots = bookedSlots;
+
+  // Use utility for dynamic slots
   const availableTimeSlots = getSlotsForDate(selectedDate);
-
-  // ... (effects)
-
   const isWeekend = (dateStr: string) => isWeekendOrHoliday(dateStr);
 
-    // ... (render)
+  const handleReservation = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
 
-                <TimeSelector
-                    selectedSlot={selectedSlot}
-                    onSelectSlot={setSelectedSlot}
-                    disabledSlots={disabledSlots}
-                    availableSlots={availableTimeSlots}
-                />
+    if (!selectedDate || !selectedSlot) {
+      setError("날짜와 시간을 선택해주세요.");
+      return;
+    }
 
-                <div className="user-info-section">
-                    <div className="section-title">
-                        <UserIcon size={20} />
-                        <h4>예약자 정보</h4>
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="text"
-                            placeholder="성함"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="premium-input"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="text"
-                            placeholder="Discord ID (선택사항 - DM 알림용)"
-                            value={discordId}
-                            onChange={(e) => setDiscordId(e.target.value)}
-                            className="premium-input"
-                        />
-                        <p className="input-hint">
-                            💡 Discord ID는 선택사항입니다. 입력하면 예약 확정 시 DM으로 알림을 받을 수 있습니다.
-                        </p>
-                    </div>
-                </div>
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
-                <div className="summary-box">
-                    <div className="summary-title">● 예약 정보 확인</div>
-                    <div className="summary-content">
-                        <div className="summary-item">
-                            <div className="item-left">
-                                <CalendarIcon size={16} /> 날짜:
-                            </div>
-                            <div className="item-right">{selectedDate || "-"}</div>
-                        </div>
-                        <div className="summary-item">
-                            <div className="item-left">
-                                <Clock size={16} /> 시간:
-                            </div>
-                            <div className="item-right">{selectedSlot || "-"} (3시간)</div>
-                        </div>
-                        <div className="summary-item">
-                            <div className="item-left">
-                                <UserIcon size={16} /> 예약자:
-                            </div>
-                            <div className="item-right">{name || "-"}</div>
-                        </div>
-                    </div>
-                </div>
-            </div >
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: selectedDate,
+          timeSlot: selectedSlot,
+          name: name,
+          discordId: discordId,
+        }),
+      });
 
-    {/* 하단 액션 버튼 및 모달 등을 포함 */ }
-    < div className = "footer-actions" style = {{ gridColumn: "1 / -1", marginTop: "40px" }
-}>
-                <button
-                    className="btn-primary confirm-btn"
-                    disabled={!selectedDate || !selectedSlot || loading}
-                    onClick={handleReservation}
-                >
-                    {loading ? <Loader2 className="animate-spin" /> : "예약 확정"}
-                </button>
-                <button
-                    className="btn-outline reset-btn"
-                    onClick={() => {
-                        setSelectedDate("");
-                        setSelectedSlot("");
-                        setError("");
-                        setSuccess("");
-                    }}
-                >
-                    초기화
-                </button>
-            </div >
+      const data = await res.json();
 
-  <div className="version-info" style={{ gridColumn: "1 / -1", textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px' }}>
-    v1.3 (Server Component + Initial Data)
-  </div>
+      if (!res.ok) {
+        throw new Error(data.error || "예약 실패");
+      }
 
-{
-  user ? (
-    <div className="my-status" style={{ gridColumn: "1 / -1" }}>
-      <div className="user-profile">
-        <Layout size={16} />
-        접속 중: <strong>{user.username}</strong>
-      </div>
-      <button
-        className="logout-link"
-        onClick={async () => {
-          try {
-            const res = await fetch("/api/auth/logout", {
-              method: "POST",
-            });
-            if (res.ok) {
-              window.location.reload();
-            }
-          } catch (error) {
-            console.error("Logout failed", error);
-          }
-        }}
-      >
-        <LogOut size={14} /> 로그아웃
-      </button>
-    </div>
-  ) : (
-    <div className="auth-footer" style={{ gridColumn: "1 / -1" }}>
-      <button onClick={() => setShowAuthModal(true)} className="btn-outline">
-        로그인 / 회원가입
-      </button>
-    </div>
-  )
-}
+      setSuccess("라운지 예약이 확정되었습니다!");
+      setSelectedSlot("");
 
-{/* 내 예약 목록 */ }
-{
-  user && reservations.filter((r) => r.userId === user.id).length > 0 && (
-    <div className="reservations-section" style={{ gridColumn: "1 / -1" }}>
-      <h3 className="sub-header">내 예약 내역</h3>
-      <div className="reservation-grid">
-        {reservations
-          .filter((r) => r.userId === user.id)
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          .map((r) => (
-            <div key={r.id} className="res-card">
-              <div className="res-card-info">
-                <div className="res-card-date">{r.date}</div>
-                <div className="res-card-time">{r.timeSlot}</div>
+      // 예약 성공 후 데이터 갱신
+      fetchReservations();
+      fetchAllAvailability();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="card main-grid">
+      {error && (
+        <div className="alert alert-error" style={{ gridColumn: "1 / -1" }}>
+          <AlertCircle size={20} />
+          <div>
+            <strong>오류 발생:</strong> {error}
+          </div>
+        </div>
+      )}
+
+      {success && (
+        <div className="alert alert-success" style={{ gridColumn: "1 / -1" }}>
+          <CheckCircle2 size={20} />
+          <div>{success}</div>
+        </div>
+      )}
+
+      <div className="section left-side">
+        <div className="section-header-row">
+          <div className="section-title">
+            <CalendarIcon size={20} />
+            <h4>날짜 선택</h4>
+          </div>
+          <button
+            className="btn-today-header"
+            onClick={() => {
+              const today = new Date();
+              const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+              setSelectedDate(dateStr);
+            }}
+          >
+            오늘
+          </button>
+        </div>
+        <Calendar
+          selectedDate={selectedDate}
+          onSelectDate={(date) => {
+            setSelectedDate(date);
+            setSelectedSlot("");
+          }}
+        />
+        {selectedDate && (
+          <div className="date-info-card">
+            <div className="date-info-top">
+              <div className="date-display-text">
+                선택된 날짜:{" "}
+                <strong>
+                  {selectedDate} ({["일", "월", "화", "수", "목", "금", "토"][new Date(selectedDate).getDay()]})
+                </strong>
               </div>
-              <button
-                className="delete-btn"
-                onClick={async () => {
-                  if (!confirm("정말 취소하시겠습니까?")) return;
-                  await fetch("/api/reservations", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: r.id }),
-                  });
-                  fetchReservations(); // 삭제 후 목록 갱신
-                  fetchAllAvailability(); // 가용성 갱신
-                }}
-              >
-                <Trash2 size={16} />
-              </button>
+              <span className={`badge ${isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
+                {isWeekend(selectedDate) ? "주말" : "평일"}
+              </span>
             </div>
-          ))}
+            <div className="date-sub-text">
+              {isWeekend(selectedDate) ? "언제든 이용 가능" : "저녁 7시부터 이용 가능"}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  )
-}
 
-{
-  showAuthModal && (
-    <AuthModal
-      onSuccess={(u) => {
-        setUser(u);
-        setShowAuthModal(false);
-      }}
-      onClose={() => setShowAuthModal(false)}
-    />
-  )
-}
+      <div className="section right-side">
+        <TimeSelector
+          selectedSlot={selectedSlot}
+          onSelectSlot={setSelectedSlot}
+          disabledSlots={disabledSlots}
+          availableSlots={availableTimeSlots}
+        />
 
-<style jsx>{`
+        <div className="user-info-section">
+          <div className="section-title">
+            <UserIcon size={20} />
+            <h4>예약자 정보</h4>
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="성함"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="premium-input"
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Discord ID (선택사항 - DM 알림용)"
+              value={discordId}
+              onChange={(e) => setDiscordId(e.target.value)}
+              className="premium-input"
+            />
+            <p className="input-hint">
+              💡 Discord ID는 선택사항입니다. 입력하면 예약 확정 시 DM으로 알림을 받을 수 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <div className="summary-box">
+          <div className="summary-title">● 예약 정보 확인</div>
+          <div className="summary-content">
+            <div className="summary-item">
+              <div className="item-left">
+                <CalendarIcon size={16} /> 날짜:
+              </div>
+              <div className="item-right">{selectedDate || "-"}</div>
+            </div>
+            <div className="summary-item">
+              <div className="item-left">
+                <Clock size={16} /> 시간:
+              </div>
+              <div className="item-right">{selectedSlot || "-"} (3시간)</div>
+            </div>
+            <div className="summary-item">
+              <div className="item-left">
+                <UserIcon size={16} /> 예약자:
+              </div>
+              <div className="item-right">{name || "-"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="footer-actions" style={{ gridColumn: "1 / -1", marginTop: "40px" }}>
+        <button
+          className="btn-primary confirm-btn"
+          disabled={!selectedDate || !selectedSlot || loading}
+          onClick={handleReservation}
+        >
+          {loading ? <Loader2 className="animate-spin" /> : "예약 확정"}
+        </button>
+        <button
+          className="btn-outline reset-btn"
+          onClick={() => {
+            setSelectedDate("");
+            setSelectedSlot("");
+            setError("");
+            setSuccess("");
+          }}
+        >
+          초기화
+        </button>
+      </div>
+
+      <div className="version-info" style={{ gridColumn: "1 / -1", textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px' }}>
+        v1.3 (Server Component + Initial Data)
+      </div>
+
+      {user ? (
+        <div className="my-status" style={{ gridColumn: "1 / -1" }}>
+          <div className="user-profile">
+            <Layout size={16} />
+            접속 중: <strong>{user.username}</strong>
+          </div>
+          <button
+            className="logout-link"
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/auth/logout", {
+                  method: "POST",
+                });
+                if (res.ok) {
+                  window.location.reload();
+                }
+              } catch (error) {
+                console.error("Logout failed", error);
+              }
+            }}
+          >
+            <LogOut size={14} /> 로그아웃
+          </button>
+        </div>
+      ) : (
+        <div className="auth-footer" style={{ gridColumn: "1 / -1" }}>
+          <button onClick={() => setShowAuthModal(true)} className="btn-outline">
+            로그인 / 회원가입
+          </button>
+        </div>
+      )}
+
+      {/* 내 예약 목록 */}
+      {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
+        <div className="reservations-section" style={{ gridColumn: "1 / -1" }}>
+          <h3 className="sub-header">내 예약 내역</h3>
+          <div className="reservation-grid">
+            {reservations
+              .filter((r) => r.userId === user.id)
+              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+              .map((r) => (
+                <div key={r.id} className="res-card">
+                  <div className="res-card-info">
+                    <div className="res-card-date">{r.date}</div>
+                    <div className="res-card-time">{r.timeSlot}</div>
+                  </div>
+                  <button
+                    className="delete-btn"
+                    onClick={async () => {
+                      if (!confirm("정말 취소하시겠습니까?")) return;
+                      await fetch("/api/reservations", {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: r.id }),
+                      });
+                      fetchReservations();
+                      fetchAllAvailability();
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {showAuthModal && (
+        <AuthModal
+          onSuccess={(u) => {
+            setUser(u);
+            setShowAuthModal(false);
+          }}
+          onClose={() => setShowAuthModal(false)}
+        />
+      )}
+
+      <style jsx>{`
         .main-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -394,6 +550,6 @@ export default function BookingForm({
            background: #fff1f2;
         }
       `}</style>
-        </div >
-    );
+    </div>
+  );
 }
