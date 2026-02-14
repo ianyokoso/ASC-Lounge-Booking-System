@@ -192,8 +192,8 @@ export default function BookingForm({
                   {selectedDate} ({["일", "월", "화", "수", "목", "금", "토"][new Date(selectedDate).getDay()]})
                 </strong>
               </div>
-              <span className={`badge ${isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
-                {isWeekend(selectedDate) ? "주말" : "평일"}
+              <span className={`badge ${isHoliday(selectedDate) ? "badge-holiday" : isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
+                {isHoliday(selectedDate) ? "공휴일" : isWeekend(selectedDate) ? "주말" : "평일"}
               </span>
             </div>
             <div className="date-sub-text">
@@ -570,6 +570,11 @@ export default function BookingForm({
         .delete-btn:hover {
            color: var(--danger);
            background: #fff1f2;
+        }
+        .badge-holiday {
+          background: #fef2f2;
+          color: #dc2626;
+          border: 1px solid #fecaca;
         }
       `}</style>
     </div>
