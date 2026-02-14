@@ -48,13 +48,11 @@ export default function RootLayout({
               src="/asc-logo.svg"
               alt="ASC Logo"
               style={{
-                height: '64px',
-                width: '64px',
-                minHeight: '64px',
-                minWidth: '64px',
+                height: '50px', // Fixed height as requested
+                width: 'auto',  // Width scales proportionally
+                aspectRatio: '1 / 1', // Prevent distortion
                 objectFit: 'contain',
-                display: 'block',
-                borderRadius: '8px'
+                display: 'block'
               }}
             />
           </div>
