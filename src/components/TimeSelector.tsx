@@ -82,40 +82,40 @@ export default function TimeSelector({
         }
         .time-cards-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 10px;
+          grid-template-columns: repeat(2, 1fr); /* 2 columns for wide buttons */
+          gap: 12px;
         }
         @media (max-width: 640px) {
           .time-cards-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr; /* 1 column on mobile */
           }
         }
         .time-card {
           background: white;
           border: 1px solid #e2e8f0;
-          padding: 16px 8px;
-          text-align: center;
+          padding: 14px 20px;
           border-radius: 12px;
           cursor: pointer;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
-          flex-direction: column;
-          gap: 4px;
+          justify-content: space-between; /* Space between time and status */
+          align-items: center;
           position: relative;
           overflow: hidden;
+          min-height: 54px;
         }
         .time-card:hover:not(.disabled):not(.selected) {
           border-color: #94a3b8;
           background: #f8fafc;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         .time-card.selected {
           border-color: #1e293b;
           background: #1e293b; /* Deep Navy */
           color: white;
-          box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25);
-          transform: scale(1.02);
+          box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+          transform: scale(1.01);
         }
         .time-card.disabled {
           background: #f8fafc;
@@ -129,34 +129,33 @@ export default function TimeSelector({
           cursor: wait;
           border-color: #e2e8f0;
           opacity: 0.8;
-          animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-          0% { opacity: 0.8; }
-          50% { opacity: 0.5; }
-          100% { opacity: 0.8; }
         }
         .time-range {
           font-weight: 700;
-          font-size: 14px;
+          font-size: 15px;
           color: inherit;
+          letter-spacing: -0.01em;
         }
         .status-label {
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 500;
-          opacity: 0.8;
+          opacity: 0.7;
         }
         .time-card.selected .status-label {
-          opacity: 1;
+          opacity: 0.9;
+          font-weight: 600;
         }
         .empty-slots {
-            padding: 30px;
+            padding: 40px;
             text-align: center;
             background: #f8fafc;
-            border-radius: 12px;
+            border-radius: 16px;
             color: #64748b;
-            font-size: 14px;
+            font-size: 15px;
             border: 1px dashed #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
       `}</style>
     </div>

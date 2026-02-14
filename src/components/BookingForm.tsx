@@ -15,6 +15,7 @@ import {
   Loader2,
   Trash2,
   LogOut,
+  ChevronRight,
 } from "lucide-react";
 import { getSlotsForDate, isWeekendOrHoliday, isHoliday } from "@/utils/timeSlots";
 
@@ -156,8 +157,9 @@ export default function BookingForm({
           </div>
         )}
 
-        <div className="main-grid">
-          <div className="section left-side">
+        {/* SECTION 1: Date & Time Selection */}
+        <div className="main-grid-row">
+          <div className="grid-col left-col">
             <div className="section-header-row">
               <div className="section-title">
                 <CalendarIcon size={20} className="icon-navy" />
@@ -193,19 +195,26 @@ export default function BookingForm({
             )}
           </div>
 
-          <div className="section right-side">
+          <div className="grid-col right-col">
             <TimeSelector
               selectedSlot={selectedSlot}
               onSelectSlot={setSelectedSlot}
               disabledSlots={disabledSlots}
               availableSlots={availableTimeSlots}
             />
+          </div>
+        </div>
 
-            <div className="user-input-group">
-              <div className="section-title">
-                <UserIcon size={20} className="icon-navy" />
-                <h4>예약자 정보</h4>
-              </div>
+        <div className="divider" />
+
+        {/* SECTION 2: User Info & Summary */}
+        <div className="main-grid-row bottom-row">
+          <div className="grid-col left-col">
+            <div className="section-title">
+              <UserIcon size={20} className="icon-navy" />
+              <h4>예약자 정보</h4>
+            </div>
+            <div className="input-group">
               <input
                 type="text"
                 placeholder="성함"
@@ -221,20 +230,24 @@ export default function BookingForm({
                 className="input-premium mt-3"
               />
             </div>
+          </div>
 
+          <div className="grid-col right-col">
             <div className="summary-card">
-              <h5 className="summary-header">● 예약 정보 확인</h5>
-              <div className="summary-row">
-                <span className="label"><CalendarIcon size={14} /> 날짜</span>
-                <span className="value">{selectedDate || "-"}</span>
-              </div>
-              <div className="summary-row">
-                <span className="label"><Clock size={14} /> 시간</span>
-                <span className="value">{selectedSlot || "-"} (3시간)</span>
-              </div>
-              <div className="summary-row">
-                <span className="label"><UserIcon size={14} /> 예약자</span>
-                <span className="value">{name || "-"}</span>
+              <h5 className="summary-header">예약 정보 확인</h5>
+              <div className="summary-content">
+                <div className="summary-row">
+                  <span className="label">날짜</span>
+                  <span className="value">{selectedDate || "-"}</span>
+                </div>
+                <div className="summary-row">
+                  <span className="label">시간</span>
+                  <span className="value">{selectedSlot || "-"}</span>
+                </div>
+                <div className="summary-row">
+                  <span className="label">예약자</span>
+                  <span className="value">{name || "-"}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -250,8 +263,6 @@ export default function BookingForm({
             <li>📌 <strong>권장사항:</strong> 다른 회원을 위해 일주일에 한 번 정도 이용을 권장합니다</li>
             <li>📌 평일은 저녁 7시부터, 주말은 제한이 없습니다</li>
             <li>📌 1인당 하루 최대 3시간까지 예약 가능합니다</li>
-            <li>📌 예약 취소는 이용 1시간 전까지 가능합니다</li>
-            <li>📌 예약 완료 시 즉시 확정되며 디스코드 DM으로 알림이 발송됩니다</li>
           </ul>
         </div>
 
@@ -276,7 +287,7 @@ export default function BookingForm({
           </button>
         </div>
 
-        <div className="version-tag">v2.0 (Sophisticated Minimalist)</div>
+        <div className="version-tag">v2.1 (Balanced Layout)</div>
 
         {user ? (
           <div className="user-bar">
@@ -360,65 +371,65 @@ export default function BookingForm({
         @media (max-width: 768px) {
             .booking-container {
                 padding: 24px;
-                margin: 20px;
+                margin: 20px auto;
             }
         }
 
         /* Header */
-        .header-section { margin-bottom: 40px; }
+        .header-section { margin-bottom: 32px; }
         .main-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
             color: #0f172a;
-            margin-bottom: 8px;
-            letter-spacing: -0.03em;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
         }
         .sub-title {
-            font-size: 16px;
+            font-size: 15px;
             color: #64748b;
             font-weight: 500;
         }
 
-        /* Alerts */
-        .alert {
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-        }
-        .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-        .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
-
-        /* Main Grid */
-        .main-grid {
+        /* Layout Grid System */
+        .main-grid-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 48px;
+            gap: 40px;
+        }
+        .bottom-row {
+            align-items: flex-start;
         }
         @media (max-width: 768px) {
-            .main-grid { grid-template-columns: 1fr; gap: 32px; }
+            .main-grid-row { grid-template-columns: 1fr; gap: 32px; }
         }
 
-        /* Section Headers */
+        .divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 32px 0;
+        }
+
+        /* Section Titles & Headers */
         .section-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .section-title {
             display: flex;
             align-items: center;
             gap: 8px;
             color: #1e293b;
+            margin-bottom: 16px; /* Default margin for non-header-row titles */
         }
+        .section-header-row .section-title { margin-bottom: 0; }
+        
         .section-title h4 {
             font-size: 16px;
             font-weight: 700;
             margin: 0;
+            letter-spacing: -0.01em;
         }
         .icon-navy { color: #1e293b; }
 
@@ -433,28 +444,27 @@ export default function BookingForm({
         }
         .btn-today:hover { background: #e2e8f0; color: #1e293b; }
 
-        /* Date Info Badge */
+        /* Date Badge */
         .date-info-badge-area {
-            margin-top: 16px;
+            margin-top: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: #f8fafc;
-            padding: 12px 16px;
-            border-radius: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
             border: 1px solid #f1f5f9;
         }
-        .date-text { font-weight: 600; color: #334155; font-size: 15px; }
+        .date-text { font-weight: 700; color: #334155; font-size: 15px; }
         .badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
         .badge-holiday { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .badge-weekend { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .badge-weekday { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
 
         /* Inputs */
-        .user-input-group { margin-top: 32px; }
         .input-premium {
             width: 100%;
-            height: 52px;
+            height: 50px;
             padding: 0 16px;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
@@ -472,55 +482,58 @@ export default function BookingForm({
 
         /* Summary Card */
         .summary-card {
-            margin-top: 32px;
-            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
             padding: 24px;
             border-radius: 16px;
-            background: #fff;
+            height: 100%;
         }
         .summary-header {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #94a3b8;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
         .summary-row {
             display: flex;
             justify-content: space-between;
-            font-size: 15px;
-            margin-bottom: 12px;
+            align-items: center;
+            font-size: 14px;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed #e2e8f0;
         }
-        .summary-row:last-child { margin-bottom: 0; }
-        .label { display: flex; align-items: center; gap: 6px; color: #64748b; font-weight: 500; }
-        .value { font-weight: 600; color: #1e293b; }
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .label { color: #64748b; font-weight: 500; }
+        .value { font-weight: 700; color: #1e293b; }
 
         /* Notice Section */
         .notice-section {
-            margin-top: 48px;
+            margin-top: 32px;
             background: #fefce8;
             border: 1px solid #fef9c3;
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px 24px;
         }
         .notice-header {
             display: flex;
             align-items: center;
             gap: 8px;
             font-weight: 700;
-            color: #854d0e;
-            margin-bottom: 12px;
-        }
-        .notice-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+            color: #b45309;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
         .notice-list li {
-            font-size: 14px;
-            color: #713f12;
-            margin-bottom: 6px;
+            font-size: 13px;
+            color: #92400e;
+            margin-bottom: 4px;
             line-height: 1.6;
         }
 
@@ -532,7 +545,7 @@ export default function BookingForm({
             margin-top: 32px;
         }
         .btn-confirm {
-            height: 56px;
+            height: 54px;
             background: #1e293b;
             color: white;
             border-radius: 12px;
@@ -550,7 +563,7 @@ export default function BookingForm({
             cursor: not-allowed;
         }
         .btn-reset {
-            height: 56px;
+            height: 54px;
             background: white;
             border: 1px solid #e2e8f0;
             color: #64748b;
@@ -561,7 +574,12 @@ export default function BookingForm({
         }
         .btn-reset:hover { border-color: #cbd5e1; color: #334155; }
 
-        /* User & Login Bars */
+        /* Misc */
+        .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+        .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+        .version-tag { text-align: center; color: #cbd5e1; font-size: 11px; margin-top: 32px; font-family: monospace; }
+        
         .user-bar, .login-bar { margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 24px; }
         .user-bar { display: flex; justify-content: space-between; align-items: center; }
         .user-left { display: flex; align-items: center; gap: 8px; color: #334155; font-size: 14px; }
@@ -570,18 +588,10 @@ export default function BookingForm({
         .btn-login { width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; color: #334155; font-weight: 600; transition: all 0.2s; }
         .btn-login:hover { background: #f8fafc; border-color: #cbd5e1; }
 
-        /* Version Tag */
-        .version-tag { text-align: center; color: #cbd5e1; font-size: 11px; margin-top: 32px; font-family: monospace; }
-        
-        /* My Reservations */
         .my-reservations { margin-top: 40px; }
         .res-header { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
         .res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .res-item {
-            background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 16px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
+        .res-item { background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .res-date { font-weight: 700; color: #1e293b; }
         .res-time { font-size: 13px; color: #64748b; margin-top: 2px; }
         .btn-delete { color: #cbd5e1; padding: 8px; border-radius: 8px; transition: all 0.2s; }
