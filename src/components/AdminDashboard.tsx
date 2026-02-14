@@ -92,17 +92,7 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
             <header className="dashboard-header">
                 <div className="header-left">
                     <Link href="/" className="back-btn">
-                        {/* Logo Placeholder */}
-                        <div style={{
-                            backgroundColor: '#1e293b',
-                            color: 'white',
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            fontWeight: 'bold',
-                            fontSize: '12px',
-                            marginRight: '12px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>ASC</div>
+                        <img src="/asc-logo.svg" alt="ASC Logo" style={{ height: '32px', marginRight: '12px' }} />
                         <ArrowLeft size={20} />
                     </Link>
                     <h1>예약 현황</h1>
