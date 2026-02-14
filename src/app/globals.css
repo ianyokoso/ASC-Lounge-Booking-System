@@ -191,8 +191,15 @@ input::placeholder {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-spin {
@@ -200,8 +207,13 @@ input::placeholder {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Badge */
@@ -222,4 +234,32 @@ input::placeholder {
 .badge-weekend {
   background: #f0fdfa;
   color: #0d9488;
+}
+
+/* Guide Card Styles */
+.guide-card {
+  background: #fffdf2;
+  border-color: #fef3c7;
+}
+
+.guide-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 16px;
+}
+
+.guide-list li {
+  font-size: 14px;
+  color: #92400e;
+  margin-bottom: 12px;
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.guide-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  font-weight: bold;
 }

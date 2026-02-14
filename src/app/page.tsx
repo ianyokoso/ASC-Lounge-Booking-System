@@ -91,31 +91,7 @@ export default async function Home() {
         </ul>
       </div>
 
-      <style jsx>{`
-        .guide-card {
-          background: #fffdf2;
-          border-color: #fef3c7;
-        }
-        .guide-list {
-          list-style: none;
-          padding: 0;
-          margin-top: 16px;
-        }
-        .guide-list li {
-          font-size: 14px;
-          color: #92400e;
-          margin-bottom: 12px;
-          padding-left: 20px;
-          position: relative;
-          line-height: 1.6;
-        }
-        .guide-list li::before {
-          content: "•";
-          position: absolute;
-          left: 0;
-          font-weight: bold;
-        }
-      `}</style>
+
     </main>
   );
 }
