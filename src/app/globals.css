@@ -35,6 +35,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Logo – 원본 비율 유지, contain 방식 배치 */
+.nav-logo {
+  width: 60px !important;
+  height: 60px !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: contain !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+}
+
 .container {
   max-width: 800px;
   margin: 0 auto;
