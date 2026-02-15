@@ -204,25 +204,18 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
 
                         return (
                             <div key={slot} className={`slot-card ${isBooked ? "booked" : "avail"}`}>
-                                <div className="slot-row-top">
+                                <div className="slot-content-row">
                                     <div className="slot-time">
-                                        <Clock size={14} />
+                                        <Clock size={15} />
                                         <span>{slot}</span>
                                     </div>
-                                    <div className={`slot-status-badge ${isBooked ? "booked" : "avail"}`}>
-                                        {isBooked ? "예약 확정" : "예약 가능"}
-                                    </div>
-                                </div>
-
-                                <div className="slot-row-bottom">
-                                    <span className="slot-id">Slot #{i + 1}</span>
-                                    <div className="slot-user-info">
+                                    <div className="slot-right">
                                         {isBooked ? (
-                                            <>
-                                                <span className="booked-name">{booking?.user?.username || booking?.user?.name || "예약됨"}</span>
-                                            </>
+                                            <span className="booked-user">
+                                                {booking?.user?.username || booking?.user?.name || "예약됨"}
+                                            </span>
                                         ) : (
-                                            <span className="avail-text">이용 가능</span>
+                                            <span className="avail-badge">예약 가능</span>
                                         )}
                                     </div>
                                 </div>
@@ -472,40 +465,50 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                 
                 .slots-grid {
                     display: grid;
-                    grid-template-columns: repeat(5, 1fr); /* Increased columns for compactness */
+                    grid-template-columns: repeat(4, 1fr);
                     gap: 12px;
                 }
-                @media (max-width: 1200px) { .slots-grid { grid-template-columns: repeat(4, 1fr); } }
-                @media (max-width: 900px) { .slots-grid { grid-template-columns: repeat(3, 1fr); } }
-                @media (max-width: 600px) { .slots-grid { grid-template-columns: repeat(2, 1fr); } }
+                @media (max-width: 1024px) { .slots-grid { grid-template-columns: repeat(2, 1fr); } }
+                @media (max-width: 640px) { .slots-grid { grid-template-columns: 1fr; } }
 
                 .slot-card {
                     background: white;
                     border-radius: 12px;
-                    padding: 16px;
+                    padding: 16px 20px;
                     border: 1px solid #e2e8f0;
                     display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    min-height: 90px;
-                    gap: 8px;
+                    align-items: center;
+                    min-height: auto; /* Remove fixed height */
+                    transition: all 0.2s;
                 }
-                .slot-card.avail { border-left: 3px solid #10b981; }
-                .slot-card.booked { border-left: 3px solid #ef4444; background: #fef2f2; }
+                .slot-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+                .slot-card.avail { border-left: 4px solid #10b981; }
+                .slot-card.booked { border-left: 4px solid #ef4444; background: #fff5f5; }
 
-                .slot-row-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-                .slot-time { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: #1e293b; }
-                .slot-status-badge { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
-                .slot-status-badge.avail { color: #10b981; background: #ecfdf5; }
-                .slot-status-badge.booked { color: #ef4444; background: #fef2f2; }
+                .slot-content-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 100%;
+                }
 
-                .slot-row-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; }
-                .slot-id { font-size: 11px; color: #94a3b8; font-weight: 500; }
+                .slot-time { 
+                    display: flex; align-items: center; gap: 8px; 
+                    font-size: 15px; font-weight: 700; color: #1e293b; 
+                }
                 
-                .slot-user-info { text-align: right; }
-                .booked-name { font-size: 13px; font-weight: 700; color: #1e293b; }
-                .avail-text { font-size: 12px; color: #10b981; font-weight: 600; }
-
+                .slot-right { display: flex; align-items: center; }
+                
+                .avail-badge {
+                    font-size: 12px; font-weight: 600; 
+                    color: #10b981; background: #ecfdf5; 
+                    padding: 4px 8px; border-radius: 6px;
+                }
+                
+                .booked-user {
+                    font-size: 13px; font-weight: 700; 
+                    color: #ef4444;
+                }
                 /* Legend */
                 .legend { display: flex; justify-content: center; gap: 24px; margin-top: 32px; font-size: 13px; color: #64748b; font-weight: 600; }
                 .legend-item { display: flex; align-items: center; gap: 6px; }
