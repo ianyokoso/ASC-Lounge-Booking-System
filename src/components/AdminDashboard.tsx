@@ -490,24 +490,35 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                     justify-content: space-between;
                     align-items: center;
                     width: 100%;
+                    gap: 8px; /* Add gap between time and status */
                 }
 
                 .slot-time { 
-                    display: flex; align-items: center; gap: 8px; 
-                    font-size: 15px; font-weight: 700; color: #1e293b; 
+                    display: flex; align-items: center; gap: 6px; 
+                    font-size: 13px; /* Reduced from 15px */
+                    font-weight: 700; color: #1e293b;
+                    white-space: nowrap; /* Prevent wrapping */
                 }
                 
                 .slot-right { display: flex; align-items: center; }
                 
                 .avail-badge {
-                    font-size: 12px; font-weight: 600; 
+                    font-size: 11px; /* Reduced from 12px */
+                    font-weight: 600; 
                     color: #10b981; background: #ecfdf5; 
                     padding: 4px 8px; border-radius: 6px;
+                    white-space: nowrap; /* Prevent wrapping */
                 }
                 
                 .booked-user {
-                    font-size: 13px; font-weight: 700; 
+                    font-size: 12px; /* Reduced from 13px */
+                    font-weight: 700; 
                     color: #ef4444;
+                    white-space: nowrap; /* Prevent wrapping */
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 80px; /* Truncate long names if necessary */
+                    text-align: right;
                 }
                 /* Legend */
                 .legend { display: flex; justify-content: center; gap: 24px; margin-top: 32px; font-size: 13px; color: #64748b; font-weight: 600; }
