@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -38,21 +39,18 @@ export default function RootLayout({
           zIndex: 1000
         }}>
           <div style={{
-            width: '60px',
-            height: '60px',
+            display: 'flex',
+            alignItems: 'center',
             flexShrink: 0,
-            marginRight: '20px',
-            overflow: 'hidden'
+            marginRight: '20px'
           }}>
-            <img
+            <Image
               src="/asc-logo.png"
               alt="ASC Logo"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                display: 'block'
-              }}
+              width={60}
+              height={60}
+              style={{ objectFit: 'contain' }}
+              priority
             />
           </div>
           <div style={{
