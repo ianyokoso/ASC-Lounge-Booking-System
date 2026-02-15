@@ -204,23 +204,27 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
 
                         return (
                             <div key={slot} className={`slot-card ${isBooked ? "booked" : "avail"}`}>
-                                <div className="slot-header">
-                                    <Clock size={14} />
-                                    <span>{slot}</span>
-                                    {isBooked && <div className="status-dot booked"></div>}
-                                    {!isBooked && <div className="status-dot avail"></div>}
-                                </div>
-                                <div className="slot-body">
-                                    <div className="slot-info">3시간 슬롯</div>
-                                    <div className={`slot-status ${isBooked ? "booked" : "avail"}`}>
-                                        ● {isBooked ? "예약 확정" : "예약 가능"}
+                                <div className="slot-row-top">
+                                    <div className="slot-time">
+                                        <Clock size={14} />
+                                        <span>{slot}</span>
+                                    </div>
+                                    <div className={`slot-status-badge ${isBooked ? "booked" : "avail"}`}>
+                                        {isBooked ? "예약 확정" : "예약 가능"}
                                     </div>
                                 </div>
-                                <div className="slot-footer">
-                                    <span className="slot-id">슬롯 #{i + 1}</span>
-                                    <button className="slot-action" disabled={isBooked}>
-                                        {isBooked ? (booking?.user?.username || booking?.user?.name || "예약됨") : "이용 가능"}
-                                    </button>
+
+                                <div className="slot-row-bottom">
+                                    <span className="slot-id">Slot #{i + 1}</span>
+                                    <div className="slot-user-info">
+                                        {isBooked ? (
+                                            <>
+                                                <span className="booked-name">{booking?.user?.username || booking?.user?.name || "예약됨"}</span>
+                                            </>
+                                        ) : (
+                                            <span className="avail-text">이용 가능</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -235,7 +239,6 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                 </div>
             </section>
 
-            {/* Recent Reservations (Simple List) */}
             {/* Recent Reservations (Simple List) */}
             <section className="recent-list-section">
                 <h3>최근 예약 내역</h3>
@@ -449,32 +452,39 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                 
                 .slots-grid {
                     display: grid;
-                    grid-template-columns: repeat(4, 1fr);
-                    gap: 16px;
+                    grid-template-columns: repeat(5, 1fr); /* Increased columns for compactness */
+                    gap: 12px;
                 }
+                @media (max-width: 1200px) { .slots-grid { grid-template-columns: repeat(4, 1fr); } }
+                @media (max-width: 900px) { .slots-grid { grid-template-columns: repeat(3, 1fr); } }
+                @media (max-width: 600px) { .slots-grid { grid-template-columns: repeat(2, 1fr); } }
+
                 .slot-card {
                     background: white;
-                    border-radius: 16px;
-                    padding: 20px;
+                    border-radius: 12px;
+                    padding: 16px;
                     border: 1px solid #e2e8f0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    min-height: 90px;
+                    gap: 8px;
                 }
-                .slot-card.avail { border-left: 4px solid #10b981; }
-                .slot-card.booked { border-left: 4px solid #ef4444; background: #fef2f2; }
+                .slot-card.avail { border-left: 3px solid #10b981; }
+                .slot-card.booked { border-left: 3px solid #ef4444; background: #fef2f2; }
 
-                .slot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 700; font-size: 15px; }
-                .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-                .status-dot.avail { background: #10b981; }
-                .status-dot.booked { background: #ef4444; }
+                .slot-row-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+                .slot-time { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: #1e293b; }
+                .slot-status-badge { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+                .slot-status-badge.avail { color: #10b981; background: #ecfdf5; }
+                .slot-status-badge.booked { color: #ef4444; background: #fef2f2; }
 
-                .slot-body { margin-bottom: 16px; }
-                .slot-info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
-                .slot-status { font-size: 13px; font-weight: 600; }
-                .slot-status.avail { color: #10b981; }
-                .slot-status.booked { color: #ef4444; }
-
-                .slot-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #64748b; padding-top: 12px; border-top: 1px solid #f1f5f9; }
-                .slot-action { font-weight: 600; color: #10b981; }
-                .booked .slot-action { color: #ef4444; }
+                .slot-row-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; }
+                .slot-id { font-size: 11px; color: #94a3b8; font-weight: 500; }
+                
+                .slot-user-info { text-align: right; }
+                .booked-name { font-size: 13px; font-weight: 700; color: #1e293b; }
+                .avail-text { font-size: 12px; color: #10b981; font-weight: 600; }
 
                 /* Legend */
                 .legend { display: flex; justify-content: center; gap: 24px; margin-top: 32px; font-size: 13px; color: #64748b; font-weight: 600; }
