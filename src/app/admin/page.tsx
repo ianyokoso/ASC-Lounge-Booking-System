@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import AdminDashboard from "@/components/AdminDashboard";
+import AdminManager from "@/components/AdminManager";
 
 export const dynamic = "force-dynamic";
 
@@ -22,5 +22,5 @@ export default async function AdminPage() {
     // Serialize data to avoid "Date object" warning (if any)
     const serializedReservations = JSON.parse(JSON.stringify(reservations));
 
-    return <AdminDashboard initialReservations={serializedReservations} isAdmin={true} />;
+    return <AdminManager initialReservations={serializedReservations} />;
 }
