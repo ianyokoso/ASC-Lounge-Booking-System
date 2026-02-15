@@ -38,9 +38,8 @@ export default function RootLayout({
           zIndex: 1000
         }}>
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            height: '100%',
+            width: '60px',
+            height: '60px',
             flexShrink: 0,
             marginRight: '20px'
           }}>
