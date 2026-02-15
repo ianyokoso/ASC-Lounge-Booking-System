@@ -11,11 +11,10 @@ import {
   Clock,
   CheckCircle2,
   Info,
-  Layout,
-  Loader2,
-  Trash2,
   LogOut,
+  Trash2,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { getSlotsForDate, isWeekendOrHoliday, isHoliday } from "@/utils/timeSlots";
 
@@ -34,8 +33,6 @@ export default function BookingForm({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
-  const [name, setName] = useState("");
-  const [discordId, setDiscordId] = useState("");
   const [reservations, setReservations] = useState<any[]>(initialReservations);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -79,13 +76,6 @@ export default function BookingForm({
     }
   }, [selectedDate, allAvailability]);
 
-  useEffect(() => {
-    if (user) {
-      setName(user.name || user.username || "");
-      setDiscordId(user.discordId || "");
-    }
-  }, [user]);
-
   const disabledSlots = bookedSlots;
   const availableTimeSlots = getSlotsForDate(selectedDate);
   const isWeekend = (dateStr: string) => isWeekendOrHoliday(dateStr);
@@ -109,11 +99,13 @@ export default function BookingForm({
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // User info is implicitly handled by the backend session or existing user data
+        // We still send the name/discordId if the backend expects it, but we use the user object directly
         body: JSON.stringify({
           date: selectedDate,
           timeSlot: selectedSlot,
-          name: name,
-          discordId: discordId,
+          name: user.name || user.username,
+          discordId: user.discordId || "",
         }),
       });
 
@@ -136,164 +128,24 @@ export default function BookingForm({
   };
 
   return (
-    <div className="booking-container">
+    <div className="layout-container">
+      {/* Header Section */}
       <div className="header-section">
-        <h1 className="main-title">라운지 예약하기</h1>
-        <p className="sub-title">원하는 날짜와 시간을 선택해주세요</p>
-      </div>
-
-      <div className="card-body">
-        {error && (
-          <div className="alert alert-error">
-            <AlertCircle size={20} />
-            <div><strong>오류 발생:</strong> {error}</div>
-          </div>
-        )}
-
-        {success && (
-          <div className="alert alert-success">
-            <CheckCircle2 size={20} />
-            <div>{success}</div>
-          </div>
-        )}
-
-        {/* SECTION 1: Date & Time Selection */}
-        <div className="main-grid-row">
-          <div className="grid-col left-col">
-            <div className="section-header-row">
-              <div className="section-title">
-                <CalendarIcon size={20} className="icon-navy" />
-                <h4>날짜 선택</h4>
-              </div>
-              <button
-                className="btn-today"
-                onClick={() => {
-                  const today = new Date();
-                  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-                  setSelectedDate(dateStr);
-                }}
-              >
-                오늘
-              </button>
-            </div>
-            <Calendar
-              selectedDate={selectedDate}
-              onSelectDate={(date) => {
-                setSelectedDate(date);
-                setSelectedSlot("");
-              }}
-            />
-            {selectedDate && (
-              <div className="date-info-badge-area">
-                <span className="date-text">
-                  {selectedDate} ({["일", "월", "화", "수", "목", "금", "토"][new Date(selectedDate).getDay()]})
-                </span>
-                <span className={`badge ${isHoliday(selectedDate) ? "badge-holiday" : isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
-                  {isHoliday(selectedDate) ? "공휴일" : isWeekend(selectedDate) ? "주말" : "평일"}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="grid-col right-col">
-            <TimeSelector
-              selectedSlot={selectedSlot}
-              onSelectSlot={setSelectedSlot}
-              disabledSlots={disabledSlots}
-              availableSlots={availableTimeSlots}
-            />
-          </div>
+        <div className="header-content">
+          <h1 className="main-title">라운지 예약</h1>
+          <p className="sub-title">편안한 공간에서 최고의 집중을 경험하세요</p>
         </div>
-
-        <div className="divider" />
-
-        {/* SECTION 2: User Info & Summary */}
-        <div className="main-grid-row bottom-row">
-          <div className="grid-col left-col">
-            <div className="section-title">
-              <UserIcon size={20} className="icon-navy" />
-              <h4>예약자 정보</h4>
-            </div>
-            <div className="input-group">
-              <input
-                type="text"
-                placeholder="성함"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="input-premium"
-              />
-              <input
-                type="text"
-                placeholder="Discord ID (선택사항 - DM 알림용)"
-                value={discordId}
-                onChange={(e) => setDiscordId(e.target.value)}
-                className="input-premium mt-3"
-              />
-            </div>
-          </div>
-
-          <div className="grid-col right-col">
-            <div className="summary-card">
-              <h5 className="summary-header">예약 정보 확인</h5>
-              <div className="summary-content">
-                <div className="summary-row">
-                  <span className="label">날짜</span>
-                  <span className="value">{selectedDate || "-"}</span>
-                </div>
-                <div className="summary-row">
-                  <span className="label">시간</span>
-                  <span className="value">{selectedSlot || "-"}</span>
-                </div>
-                <div className="summary-row">
-                  <span className="label">예약자</span>
-                  <span className="value">{name || "-"}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="notice-section">
-          <div className="notice-header">
-            <Info size={18} style={{ color: '#d97706' }} />
-            <span>예약 안내</span>
-          </div>
-          <ul className="notice-list">
-            <li>📌 <strong>새로운 정책:</strong> 예약은 3시간 단위로 가능합니다</li>
-            <li>📌 <strong>권장사항:</strong> 다른 회원을 위해 일주일에 한 번 정도 이용을 권장합니다</li>
-            <li>📌 평일은 저녁 7시부터, 주말은 제한이 없습니다</li>
-            <li>📌 1인당 하루 최대 3시간까지 예약 가능합니다</li>
-          </ul>
-        </div>
-
-        <div className="action-buttons">
-          <button
-            className="btn-confirm"
-            disabled={!selectedDate || !selectedSlot || loading}
-            onClick={handleReservation}
-          >
-            {loading ? <Loader2 className="animate-spin" /> : "예약 확정"}
-          </button>
-          <button
-            className="btn-reset"
-            onClick={() => {
-              setSelectedDate("");
-              setSelectedSlot("");
-              setError("");
-              setSuccess("");
-            }}
-          >
-            초기화
-          </button>
-        </div>
-
-        <div className="version-tag">v2.1 (Balanced Layout)</div>
 
         {user ? (
-          <div className="user-bar">
-            <div className="user-left">
-              <Layout size={16} />
-              <span>접속 중: <strong>{user.username}</strong></span>
+          <div className="user-profile-card">
+            <div className="user-info">
+              <div className="avatar-circle">
+                {user.username?.[0]?.toUpperCase() || <UserIcon size={18} />}
+              </div>
+              <div className="user-text">
+                <span className="user-name">{user.username}님 안녕하세요!</span>
+                <span className="user-role">ASC Member <ShieldCheck size={12} style={{ display: 'inline', marginLeft: 4 }} /></span>
+              </div>
             </div>
             <button
               className="btn-logout"
@@ -304,34 +156,149 @@ export default function BookingForm({
                 } catch (error) { console.error("Logout failed", error); }
               }}
             >
-              <LogOut size={14} /> 로그아웃
+              <LogOut size={16} />
             </button>
           </div>
         ) : (
-          <div className="login-bar">
-            <button onClick={() => setShowAuthModal(true)} className="btn-login">
-              로그인 / 회원가입
-            </button>
-          </div>
+          <button onClick={() => setShowAuthModal(true)} className="btn-login-header">
+            로그인 / 회원가입
+          </button>
         )}
+      </div>
 
-        {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
-          <div className="my-reservations">
-            <h3 className="res-header">내 예약 내역</h3>
-            <div className="res-grid">
-              {reservations
-                .filter((r) => r.userId === user.id)
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                .map((r) => (
-                  <div key={r.id} className="res-item">
-                    <div className="res-info">
-                      <div className="res-date">{r.date}</div>
-                      <div className="res-time">{r.timeSlot}</div>
+      <div className="booking-grid">
+        {/* Left Column: Calendar & Time */}
+        <div className="main-content">
+
+          {/* Messages */}
+          {error && (
+            <div className="alert alert-error">
+              <AlertCircle size={20} />
+              <span>{error}</span>
+            </div>
+          )}
+          {success && (
+            <div className="alert alert-success">
+              <CheckCircle2 size={20} />
+              <span>{success}</span>
+            </div>
+          )}
+
+          {/* Step 1: Date */}
+          <div className="step-card">
+            <div className="step-header">
+              <div className="step-number">01</div>
+              <h3>날짜 선택</h3>
+              {selectedDate && <span className="step-check"><CheckCircle2 size={18} /></span>}
+            </div>
+            <div className="calendar-wrapper">
+              <Calendar
+                selectedDate={selectedDate}
+                onSelectDate={(date) => {
+                  setSelectedDate(date);
+                  setSelectedSlot("");
+                  setError("");
+                }}
+              />
+            </div>
+            {selectedDate && (
+              <div className="selected-date-banner">
+                <CalendarIcon size={16} />
+                <span>{selectedDate}</span>
+                <div className={`badge ${isHoliday(selectedDate) ? "badge-holiday" : isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
+                  {isHoliday(selectedDate) ? "공휴일" : isWeekend(selectedDate) ? "주말" : "평일"}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Step 2: Time */}
+          <div className={`step-card ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
+            <div className="step-header">
+              <div className="step-number">02</div>
+              <h3>시간 선택</h3>
+            </div>
+            <div className="time-selector-wrapper">
+              <TimeSelector
+                selectedSlot={selectedSlot}
+                onSelectSlot={setSelectedSlot}
+                disabledSlots={disabledSlots}
+                availableSlots={availableTimeSlots}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Summary & Confirmation */}
+        <div className="sidebar">
+          <div className="sticky-sidebar">
+            <div className="summary-card">
+              <div className="summary-header">
+                <h3>예약 요약</h3>
+              </div>
+              <div className="summary-body">
+                <div className="summary-item">
+                  <span className="label">날짜</span>
+                  <span className="value">{selectedDate || "-"}</span>
+                </div>
+                <div className="summary-item">
+                  <span className="label">시간</span>
+                  <span className="value">{selectedSlot || "-"}</span>
+                </div>
+                <div className="summary-item">
+                  <span className="label">예약자</span>
+                  <span className="value">{user?.username || "-"}</span>
+                </div>
+              </div>
+
+              <div className="summary-footer">
+                <button
+                  className="btn-confirm-booking"
+                  disabled={!selectedDate || !selectedSlot || loading || !user}
+                  onClick={handleReservation}
+                >
+                  {loading ? "처리중..." : "예약 확정하기"}
+                </button>
+                {!user && <p className="login-hint">* 로그인이 필요합니다</p>}
+              </div>
+            </div>
+
+            <div className="notice-card">
+              <div className="notice-title">
+                <Info size={16} /> 이용 안내
+              </div>
+              <ul>
+                <li>예약은 3시간 단위입니다.</li>
+                <li>하루 최대 1회(3시간) 가능합니다.</li>
+                <li>평일 19시 이후 / 주말 상시 운영</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* My Reservations Section */}
+      {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
+        <div className="my-reservations-section">
+          <h2 className="section-heading">나의 예약 현황</h2>
+          <div className="reservations-grid">
+            {reservations
+              .filter((r) => r.userId === user.id)
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // 최신순
+              .map((r) => (
+                <div key={r.id} className="reservation-card">
+                  <div className="res-status-bar"></div>
+                  <div className="res-content">
+                    <div className="res-time-badge">
+                      <Clock size={14} /> {r.timeSlot}
+                    </div>
+                    <div className="res-date-text">
+                      {r.date}
                     </div>
                     <button
-                      className="btn-delete"
+                      className="btn-cancel"
                       onClick={async () => {
-                        if (!confirm("정말 취소하시겠습니까?")) return;
+                        if (!confirm("예약을 취소하시겠습니까?")) return;
                         await fetch("/api/reservations", {
                           method: "DELETE",
                           headers: { "Content-Type": "application/json" },
@@ -341,14 +308,14 @@ export default function BookingForm({
                         fetchAllAvailability();
                       }}
                     >
-                      <Trash2 size={16} />
+                      예약 취소
                     </button>
                   </div>
-                ))}
-            </div>
+                </div>
+              ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {showAuthModal && (
         <AuthModal
@@ -358,244 +325,208 @@ export default function BookingForm({
       )}
 
       <style jsx>{`
-        /* Global Container */
-        .booking-container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
-            padding: 40px;
-            border: 1px solid #f1f5f9;
-        }
-        @media (max-width: 768px) {
-            .booking-container {
-                padding: 24px;
-                margin: 20px auto;
-            }
+        .layout-container {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 40px 20px;
+          font-family: 'Pretendard', sans-serif;
         }
 
         /* Header */
-        .header-section { margin-bottom: 32px; }
+        .header-section {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-bottom: 50px;
+          flex-wrap: wrap;
+          gap: 20px;
+        }
         .main-title {
-            font-size: 26px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 6px;
-            letter-spacing: -0.02em;
+          font-size: 36px;
+          font-weight: 800;
+          color: #1e293b;
+          letter-spacing: -0.03em;
+          margin-bottom: 8px;
         }
         .sub-title {
-            font-size: 15px;
-            color: #64748b;
-            font-weight: 500;
+          font-size: 16px;
+          color: #64748b;
+          font-weight: 500;
         }
 
-        /* Layout Grid System */
-        .main-grid-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
+        /* User Profile */
+        .user-profile-card {
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 50px;
+          padding: 8px 16px 8px 8px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-        .bottom-row {
-            align-items: flex-start;
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar-circle {
+          width: 40px; height: 40px;
+          background: #4f46e5;
+          color: white;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-weight: 700;
+          font-size: 18px;
         }
-        @media (max-width: 768px) {
-            .main-grid-row { grid-template-columns: 1fr; gap: 32px; }
+        .user-text { display: flex; flex-direction: column; }
+        .user-name { font-weight: 700; font-size: 14px; color: #1e293b; }
+        .user-role { font-size: 11px; color: #64748b; font-weight: 600; display: flex; align-items: center; }
+        .btn-logout { 
+          width: 36px; height: 36px; 
+          border-radius: 50%; 
+          border: 1px solid #f1f5f9; 
+          display: flex; align-items: center; justify-content: center; 
+          color: #94a3b8;
+          transition: all 0.2s;
+        }
+        .btn-logout:hover { background: #fef2f2; color: #ef4444; border-color: #fee2e2; }
+        .btn-login-header {
+          background: #1e293b; color: white;
+          padding: 12px 24px; border-radius: 12px;
+          font-weight: 600; font-size: 14px;
+          transition: all 0.2s;
+        }
+        .btn-login-header:hover { background: #334155; transform: translateY(-1px); }
+
+        /* Grid Layout */
+        .booking-grid {
+          display: grid;
+          grid-template-columns: 1fr 340px;
+          gap: 40px;
+        }
+        @media (max-width: 900px) {
+          .booking-grid { grid-template-columns: 1fr; }
+          .header-section { flex-direction: column; align-items: flex-start; }
         }
 
-        .divider {
-            height: 1px;
-            background: #f1f5f9;
-            margin: 32px 0;
+        /* Steps */
+        .step-card {
+          background: white;
+          border-radius: 24px;
+          padding: 32px;
+          margin-bottom: 32px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+          border: 1px solid #f8fafc;
+        }
+        .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .step-number {
+          width: 32px; height: 32px;
+          background: #1e293b; color: white;
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          font-weight: 700; font-size: 14px;
+        }
+        .step-header h3 { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0; }
+        .step-check { color: #10b981; margin-left: auto; }
+
+        .selected-date-banner {
+          margin-top: 20px;
+          background: #f8fafc;
+          padding: 16px;
+          border-radius: 12px;
+          display: flex; align-items: center; gap: 10px;
+          color: #1e293b; font-weight: 600;
         }
 
-        /* Section Titles & Headers */
-        .section-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #1e293b;
-            margin-bottom: 16px; /* Default margin for non-header-row titles */
-        }
-        .section-header-row .section-title { margin-bottom: 0; }
-        
-        .section-title h4 {
-            font-size: 16px;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.01em;
-        }
-        .icon-navy { color: #1e293b; }
-
-        .btn-today {
-            background: #f1f5f9;
-            color: #475569;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .btn-today:hover { background: #e2e8f0; color: #1e293b; }
-
-        /* Date Badge */
-        .date-info-badge-area {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-            padding: 14px 18px;
-            border-radius: 14px;
-            border: 1px solid #f1f5f9;
-        }
-        .date-text { font-weight: 700; color: #334155; font-size: 15px; }
-        .badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-        .badge-holiday { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        .badge-weekend { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-        .badge-weekday { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
-
-        /* Inputs */
-        .input-premium {
-            width: 100%;
-            height: 50px;
-            padding: 0 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.2s;
-            color: #1e293b;
-            background: #fff;
-        }
-        .input-premium:focus {
-            border-color: #1e293b;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.05);
-        }
-        .mt-3 { margin-top: 12px; }
-
-        /* Summary Card */
+        /* Sidebar & Summary */
         .summary-card {
-            background: #f8fafc;
-            border: 1px solid #f1f5f9;
-            padding: 24px;
-            border-radius: 16px;
-            height: 100%;
+          background: white;
+          border-radius: 24px;
+          padding: 30px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+          border: 1px solid #f1f5f9;
         }
-        .summary-header {
-            font-size: 13px;
-            font-weight: 700;
-            color: #94a3b8;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .summary-header h3 { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 24px; }
+        .summary-item {
+          display: flex; justify-content: space-between;
+          margin-bottom: 16px; padding-bottom: 16px;
+          border-bottom: 1px dashed #e2e8f0;
         }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            margin-bottom: 14px;
-            padding-bottom: 14px;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-        .summary-row:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        .label { color: #64748b; font-weight: 500; }
-        .value { font-weight: 700; color: #1e293b; }
+        .summary-item:last-child { border-bottom: none; }
+        .label { color: #64748b; font-size: 14px; font-weight: 500; }
+        .value { color: #1e293b; font-size: 15px; font-weight: 700; }
 
-        /* Notice Section */
-        .notice-section {
-            margin-top: 32px;
-            background: #fefce8;
-            border: 1px solid #fef9c3;
-            border-radius: 16px;
-            padding: 20px 24px;
+        .btn-confirm-booking {
+          width: 100%;
+          padding: 18px;
+          background: #4f46e5;
+          color: white;
+          border-radius: 16px;
+          font-size: 16px; font-weight: 700;
+          margin-top: 20px;
+          transition: all 0.2s;
+          box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
-        .notice-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            color: #b45309;
-            margin-bottom: 10px;
-            font-size: 14px;
+        .btn-confirm-booking:hover:not(:disabled) {
+          background: #4338ca; transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
         }
-        .notice-list li {
-            font-size: 13px;
-            color: #92400e;
-            margin-bottom: 4px;
-            line-height: 1.6;
+        .btn-confirm-booking:disabled {
+          background: #cbd5e1; box-shadow: none; cursor: not-allowed;
         }
+        .login-hint { text-align: center; color: #ef4444; font-size: 12px; margin-top: 10px; font-weight: 600; }
 
-        /* Action Buttons */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 16px;
-            margin-top: 32px;
+        .notice-card {
+          margin-top: 24px;
+          background: #fffbeb;
+          border: 1px solid #fef3c7;
+          border-radius: 16px;
+          padding: 20px;
         }
-        .btn-confirm {
-            height: 54px;
-            background: #1e293b;
-            color: white;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            transition: all 0.2s;
+        .notice-title {
+          font-size: 14px; font-weight: 700; color: #b45309;
+          display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
         }
-        .btn-confirm:hover:not(:disabled) {
-            background: #0f172a;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
-        }
-        .btn-confirm:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-        .btn-reset {
-            height: 54px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            color: #64748b;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-reset:hover { border-color: #cbd5e1; color: #334155; }
+        .notice-card ul { padding-left: 20px; margin: 0; }
+        .notice-card li { font-size: 13px; color: #92400e; margin-bottom: 6px; }
 
-        /* Misc */
-        .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        /* My Reservations */
+        .my-reservations-section { margin-top: 80px; }
+        .section-heading { font-size: 24px; font-weight: 800; margin-bottom: 24px; color: #1e293b; }
+        .reservations-grid {
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+        }
+        .reservation-card {
+          background: white; border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+          border: 1px solid #f1f5f9;
+          transition: transform 0.2s;
+        }
+        .reservation-card:hover { transform: translateY(-2px); }
+        .res-status-bar { height: 6px; background: #10b981; }
+        .res-content { padding: 24px; }
+        .res-time-badge {
+          display: inline-flex; align-items: center; gap: 6px;
+          background: #f0fdf4; color: #15803d;
+          padding: 6px 12px; border-radius: 20px;
+          font-size: 12px; font-weight: 700; margin-bottom: 12px;
+        }
+        .res-date-text { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 20px; }
+        .btn-cancel {
+          width: 100%; padding: 10px;
+          border: 1px solid #fee2e2; background: white;
+          color: #ef4444; font-weight: 600; border-radius: 10px;
+          font-size: 14px; transition: all 0.2s;
+        }
+        .btn-cancel:hover { background: #fee2e2; }
+
+        /* Alerts */
+        .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
         .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
         .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
-        .version-tag { text-align: center; color: #cbd5e1; font-size: 11px; margin-top: 32px; font-family: monospace; }
         
-        .user-bar, .login-bar { margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 24px; }
-        .user-bar { display: flex; justify-content: space-between; align-items: center; }
-        .user-left { display: flex; align-items: center; gap: 8px; color: #334155; font-size: 14px; }
-        .btn-logout { background: none; color: #94a3b8; font-size: 13px; display: flex; align-items: center; gap: 4px; font-weight: 500; }
-        .btn-logout:hover { color: #ef4444; }
-        .btn-login { width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; color: #334155; font-weight: 600; transition: all 0.2s; }
-        .btn-login:hover { background: #f8fafc; border-color: #cbd5e1; }
-
-        .my-reservations { margin-top: 40px; }
-        .res-header { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
-        .res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .res-item { background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .res-date { font-weight: 700; color: #1e293b; }
-        .res-time { font-size: 13px; color: #64748b; margin-top: 2px; }
-        .btn-delete { color: #cbd5e1; padding: 8px; border-radius: 8px; transition: all 0.2s; }
-        .btn-delete:hover { background: #fee2e2; color: #ef4444; }
+        .badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; margin-left: auto; }
+        .badge-holiday { background: #fef2f2; color: #dc2626; }
+        .badge-weekend { background: #eff6ff; color: #2563eb; }
+        .badge-weekday { background: #f1f5f9; color: #64748b; }
       `}</style>
     </div>
   );
