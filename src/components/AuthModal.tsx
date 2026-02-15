@@ -80,7 +80,17 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
 
                 <div className="auth-header">
                     <h3>{isLogin ? "임시 로그인" : "예약자 등록"}</h3>
-                    <p>{isLogin ? "임시 아이디와 비밀번호를 입력해주세요." : "예약을 위한 정보를 입력해주세요."}</p>
+                    <p style={{ wordBreak: 'keep-all', lineHeight: '1.6' }}>
+                        {isLogin
+                            ? "예약 시 사용했던 아이디와 비밀번호를 입력해주세요."
+                            : (
+                                <>
+                                    본 서비스는 <strong>임시 아이디 체계</strong>로 운영됩니다.<br />
+                                    <strong>디스코드 ID</strong>와 기억하기 쉬운 <strong>간단한 비밀번호</strong>를 사용해 주세요.
+                                </>
+                            )
+                        }
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
