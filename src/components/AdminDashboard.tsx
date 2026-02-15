@@ -97,8 +97,13 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                     <img
                         src="/asc-logo.png"
                         alt="ASC Logo"
-                        className="nav-logo"
-                        style={{ marginLeft: '8px' }}
+                        style={{
+                            width: '50px',
+                            height: '50px',
+                            objectFit: 'contain',
+                            display: 'block',
+                            marginLeft: '8px'
+                        }}
                     />
                     <h1 style={{ fontSize: '28px', fontWeight: '800', marginLeft: '16px', margin: 0 }}>예약 현황</h1>
                 </div>

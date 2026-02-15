@@ -41,12 +41,18 @@ export default function RootLayout({
             width: '60px',
             height: '60px',
             flexShrink: 0,
-            marginRight: '20px'
+            marginRight: '20px',
+            overflow: 'hidden'
           }}>
             <img
               src="/asc-logo.png"
               alt="ASC Logo"
-              className="nav-logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block'
+              }}
             />
           </div>
           <div style={{
