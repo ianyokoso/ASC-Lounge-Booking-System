@@ -105,7 +105,6 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                 <div className="calendar-header">
                     <button onClick={prevMonth} className="nav-btn"><ChevronLeft size={20} /></button>
                     <h2>{year}년 {String(month + 1).padStart(2, "0")}월</h2>
-                    <button onClick={prevMonth} className="nav-btn hidden"><ChevronLeft size={20} /></button>
                     <button onClick={nextMonth} className="nav-btn"><ChevronRight size={20} /></button>
                 </div>
 
