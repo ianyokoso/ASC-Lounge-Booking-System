@@ -269,7 +269,7 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
             <style jsx>{`
                 /* Container */
                 .dashboard-container {
-                    max-width: 1000px;
+                    max-width: 1400px; /* Increased from 1000px */
                     margin: 0 auto;
                     padding: 40px 20px;
                     background-color: #f8fafc;
