@@ -15,6 +15,7 @@ import {
   Trash2,
   ChevronRight,
   ShieldCheck,
+  ExternalLink,
 } from "lucide-react";
 import { getSlotsForDate, isWeekendOrHoliday, isHoliday } from "@/utils/timeSlots";
 
@@ -134,6 +135,15 @@ export default function BookingForm({
         <div className="header-content">
           <h1 className="main-title">ASC 구디 라운지 예약</h1>
           <p className="sub-title">편안한 공간에서 최고의 집중을 경험하세요</p>
+          <a
+            href="https://mellow-melon-4ac.notion.site/ASC-3056400e926880e6975aeb71c204cc0b?source=copy_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="notion-link"
+          >
+            <ExternalLink size={14} />
+            라운지 이용 규칙 및 타 지점 안내
+          </a>
         </div>
 
         {user ? (
@@ -352,6 +362,24 @@ export default function BookingForm({
           font-size: 16px;
           color: #64748b;
           font-weight: 500;
+        }
+        .notion-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 12px;
+          font-size: 13px;
+          color: #4f46e5;
+          font-weight: 600;
+          background: #eef2ff;
+          padding: 6px 12px;
+          border-radius: 20px;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+        .notion-link:hover {
+          background: #e0e7ff;
+          color: #4338ca;
         }
 
         /* User Profile */
