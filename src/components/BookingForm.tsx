@@ -132,7 +132,7 @@ export default function BookingForm({
       {/* Header Section */}
       <div className="header-section">
         <div className="header-content">
-          <h1 className="main-title">라운지 예약</h1>
+          <h1 className="main-title">ASC 구디 라운지 예약</h1>
           <p className="sub-title">편안한 공간에서 최고의 집중을 경험하세요</p>
         </div>
 
