@@ -142,7 +142,7 @@ export default function BookingForm({
             className="notion-link"
           >
             <ExternalLink size={14} />
-            라운지 이용 규칙 및 타 지점 안내
+            라운지 이용 규칙 및 다른 라운지 안내
           </a>
         </div>
 
