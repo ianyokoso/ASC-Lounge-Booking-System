@@ -9,7 +9,8 @@ import {
     ChevronRight,
     CheckCircle2,
     TrendingUp,
-    Clock
+    Clock,
+    User as UserIcon
 } from "lucide-react";
 import Link from "next/link";
 import { getSlotsForDate, isHoliday as checkIsHoliday } from "@/utils/timeSlots";
@@ -235,14 +236,44 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
             </section>
 
             {/* Recent Reservations (Simple List) */}
+            {/* Recent Reservations (Simple List) */}
             <section className="recent-list-section">
                 <h3>최근 예약 내역</h3>
                 <p>전체 예약 중 최근 10건 표시</p>
-                <div className="empty-state-box">
-                    <CalendarIcon size={32} />
-                    <p>예약 내역이 없습니다</p>
-                    <span>아직 등록된 예약이 없습니다. 첫 번째 예약을 만들어보세요!</span>
-                </div>
+
+                {reservations.length > 0 ? (
+                    <div className="recent-list">
+                        {reservations
+                            .slice(0, 10) // Limit to 10
+                            .map((r, i) => (
+                                <div key={r.id || i} className="recent-item">
+                                    <div className="recent-info">
+                                        <div className="recent-user">
+                                            <div className="avatar-xs">
+                                                {r.user?.username?.[0]?.toUpperCase() || <UserIcon size={12} />}
+                                            </div>
+                                            <span className="name">{r.user?.username || r.user?.name || "알 수 없음"}</span>
+                                            <span className="role-tag">ASC Member</span>
+                                        </div>
+                                        <div className="recent-time">
+                                            <CalendarIcon size={14} /> {r.date}
+                                            <span className="sep">|</span>
+                                            <Clock size={14} /> {r.timeSlot}
+                                        </div>
+                                    </div>
+                                    <div className="recent-status">
+                                        <span className="status-badge">예약 확정</span>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                ) : (
+                    <div className="empty-state-box">
+                        <CalendarIcon size={32} />
+                        <p>예약 내역이 없습니다</p>
+                        <span>아직 등록된 예약이 없습니다. 첫 번째 예약을 만들어보세요!</span>
+                    </div>
+                )}
             </section>
 
             <style jsx>{`
@@ -470,8 +501,45 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                     gap: 12px;
                 }
                 .empty-state-box p { font-size: 16px; font-weight: 700; color: #1e293b; margin: 0; }
+
+                /* Recent List Styling */
+                .recent-list {
+                    background: white;
+                    border-radius: 16px;
+                    border: 1px solid #e2e8f0;
+                    overflow: hidden;
+                }
+                .recent-item {
+                    padding: 20px;
+                    border-bottom: 1px solid #f1f5f9;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    transition: background 0.2s;
+                }
+                .recent-item:last-child { border-bottom: none; }
+                .recent-item:hover { background: #f8fafc; }
+
+                .recent-info { display: flex; flex-direction: column; gap: 8px; }
+                .recent-user { display: flex; align-items: center; gap: 8px; }
+                .avatar-xs {
+                    width: 24px; height: 24px;
+                    background: #e0e7ff; color: #4338ca;
+                    border-radius: 50%;
+                    font-size: 11px; font-weight: 700;
+                    display: flex; align-items: center; justify-content: center;
+                }
+                .recent-user .name { font-weight: 700; font-size: 14px; color: #1e293b; }
+                .role-tag { font-size: 11px; background: #f1f5f9; color: #64748b; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
                 
-                @media (max-width: 1024px) {
+                .recent-time { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #64748b; }
+                .recent-time .sep { color: #cbd5e1; font-size: 10px; }
+
+                .recent-status .status-badge {
+                    background: #f0fdf4; color: #15803d;
+                    padding: 6px 10px; border-radius: 20px;
+                    font-size: 12px; font-weight: 700;
+                }
                     .stats-row, .slots-grid { grid-template-columns: repeat(2, 1fr); }
                 }
                 @media (max-width: 640px) {
