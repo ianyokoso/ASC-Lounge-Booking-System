@@ -45,7 +45,7 @@ export default function RootLayout({
               height: '60px',
               flexShrink: 0,
               marginRight: '20px',
-              backgroundImage: 'url(/asc-logo.png)',
+              backgroundImage: 'url(https://i.imgur.com/kA9tM7m.png)',
               backgroundSize: 'contain',
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center'
