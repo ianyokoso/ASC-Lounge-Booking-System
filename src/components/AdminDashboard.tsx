@@ -95,17 +95,6 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                     <Link href="/" className="back-btn">
                         <ArrowLeft size={24} />
                     </Link>
-                    <img
-                        src="https://i.imgur.com/kA9tM7m.png"
-                        alt="ASC Logo"
-                        style={{
-                            width: '50px',
-                            height: '50px',
-                            objectFit: 'contain',
-                            display: 'block',
-                            marginLeft: '8px'
-                        }}
-                    />
                     <h1 style={{ fontSize: '28px', fontWeight: '800', marginLeft: '16px', margin: 0 }}>예약 현황</h1>
                 </div>
                 <button onClick={goToToday} className="btn-today">오늘</button>
@@ -131,6 +120,12 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                         const isFull = item.stats.total > 0 && item.stats.available === 0;
                         const isHoliday = checkIsHoliday(item.dateStr);
                         const dayOfWeek = new Date(item.dateStr).getDay();
+
+                        // Check if this days is Today
+                        const today = new Date();
+                        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+                        const isToday = item.dateStr === todayStr;
+
                         // Red if Sunday (0) OR Holiday
                         const isRed = dayOfWeek === 0 || isHoliday;
                         const isBlue = dayOfWeek === 6 && !isHoliday;
@@ -147,7 +142,7 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                                 <div className={`status-chip ${isFull ? "full" : "avail"}`}>
                                     {isFull ? "예약 마감" : `빈 슬롯 ${item.stats.available}`}
                                 </div>
-                                {isHoliday && <div className="holiday-dot" title="공휴일"></div>}
+                                {isToday && <div className="today-dot" title="오늘"></div>}
                             </div>
                         );
                     })}
@@ -403,10 +398,10 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                 .status-chip.avail { background: #eff6ff; color: #3b82f6; }
                 .status-chip.full { background: #fef2f2; color: #ef4444; }
                 
-                .holiday-dot {
+                .today-dot {
                     width: 6px;
                     height: 6px;
-                    background-color: #ef4444;
+                    background-color: #1e293b; /* Dark color for Today */
                     border-radius: 50%;
                     position: absolute;
                     top: 12px;
