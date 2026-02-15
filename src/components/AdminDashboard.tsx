@@ -425,30 +425,39 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                 .stats-row {
                     display: grid;
                     grid-template-columns: repeat(3, 1fr);
-                    gap: 16px; /* Reduced gap */
+                    gap: 12px;
                     margin-bottom: 24px;
                 }
                 .stat-card {
                     background: white;
-                    padding: 20px 24px; /* Reduced padding */
-                    border-radius: 16px;
+                    padding: 16px 20px;
+                    border-radius: 12px;
                     border: 1px solid #e2e8f0;
                     display: flex;
-                    flex-direction: row; /* Horizontal layout */
+                    flex-direction: row;
                     align-items: center;
                     justify-content: space-between;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+                    min-height: 60px;
                 }
-                .stat-content { display: flex; flex-direction: column; gap: 2px; }
-                .stat-label { font-size: 13px; color: #64748b; font-weight: 600; margin: 0; }
-                .stat-value { font-size: 24px; font-weight: 800; color: #1e293b; line-height: 1.2; }
+                /* Horizontal content: Label + Value */
+                .stat-content { 
+                    display: flex; 
+                    flex-direction: row; 
+                    align-items: center; 
+                    gap: 12px; 
+                }
+                .stat-label { font-size: 14px; color: #64748b; font-weight: 600; margin: 0; }
+                .stat-value { font-size: 20px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: -2px; }
                 
                 .stat-icon-wrapper { 
-                    width: 48px; height: 48px; 
-                    border-radius: 10px; 
+                    width: 36px; height: 36px; 
+                    border-radius: 8px; 
                     display: flex; align-items: center; justify-content: center;
-                    opacity: 1 !important; /* Force visible opacity */
+                    opacity: 1 !important;
                 }
+                .stat-icon-wrapper svg { width: 18px; height: 18px; }
+
                 .stat-icon-wrapper.gray { background: #f1f5f9; color: #64748b; }
                 .stat-icon-wrapper.green { background: #f0fdf4; color: #166534; }
                 .stat-icon-wrapper.blue { background: #eff6ff; color: #1e40af; }
@@ -561,7 +570,12 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                     padding: 6px 10px; border-radius: 20px;
                     font-size: 12px; font-weight: 700;
                 }
-                    .stats-row, .slots-grid { grid-template-columns: repeat(2, 1fr); }
+                @media (max-width: 1024px) {
+                    .slots-grid { grid-template-columns: repeat(2, 1fr); }
+                }
+                @media (max-width: 700px) {
+                    .stats-row { grid-template-columns: 1fr; }
+                    .stat-content { justify-content: space-between; width: 100%; }
                 }
                 @media (max-width: 640px) {
                     .stats-row, .slots-grid { grid-template-columns: 1fr; }
