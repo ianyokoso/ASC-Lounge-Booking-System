@@ -95,7 +95,7 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                         <ArrowLeft size={24} />
                     </Link>
                     <img
-                        src="/asc-logo.svg"
+                        src="/asc-logo.png"
                         alt="ASC Logo"
                         width={60}
                         height={60}

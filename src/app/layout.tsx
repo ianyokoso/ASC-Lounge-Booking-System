@@ -45,7 +45,7 @@ export default function RootLayout({
             marginRight: '20px'
           }}>
             <img
-              src="/asc-logo.svg"
+              src="/asc-logo.png"
               alt="ASC Logo"
               width={60}
               height={60}
