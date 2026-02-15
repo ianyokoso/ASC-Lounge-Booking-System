@@ -47,11 +47,14 @@ export default function RootLayout({
             <img
               src="/asc-logo.svg"
               alt="ASC Logo"
+              width={60}
+              height={60}
               style={{
-                height: '40px',
-                width: 'auto',
+                width: '60px',
+                height: '60px',
                 objectFit: 'contain',
-                display: 'block'
+                display: 'block',
+                flexShrink: 0
               }}
             />
           </div>
