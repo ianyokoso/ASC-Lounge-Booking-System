@@ -424,26 +424,37 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                 /* Stats Row */
                 .stats-row {
                     display: grid;
-                    grid-template-columns: repeat(3, 1fr); /* Changed to 3 columns */
-                    gap: 20px;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 16px; /* Reduced gap */
                     margin-bottom: 24px;
                 }
                 .stat-card {
                     background: white;
-                    padding: 24px;
+                    padding: 20px 24px; /* Reduced padding */
                     border-radius: 16px;
                     border: 1px solid #e2e8f0;
                     display: flex;
-                    flex-direction: column;
-                    position: relative;
+                    flex-direction: row; /* Horizontal layout */
+                    align-items: center;
+                    justify-content: space-between;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
                 }
-                .stat-label { font-size: 13px; color: #64748b; font-weight: 600; margin-bottom: 8px; }
-                .stat-value { font-size: 28px; font-weight: 800; color: #1e293b; }
-                .stat-icon { position: absolute; right: 24px; top: 24px; opacity: 0.1; width: 40px; height: 40px; }
+                .stat-content { display: flex; flex-direction: column; gap: 2px; }
+                .stat-label { font-size: 13px; color: #64748b; font-weight: 600; margin: 0; }
+                .stat-value { font-size: 24px; font-weight: 800; color: #1e293b; line-height: 1.2; }
                 
-                .text-green { color: #10b981; }
-                .text-orange { color: #f59e0b; }
-                .text-blue { color: #3b82f6; }
+                .stat-icon-wrapper { 
+                    width: 48px; height: 48px; 
+                    border-radius: 10px; 
+                    display: flex; align-items: center; justify-content: center;
+                    opacity: 1 !important; /* Force visible opacity */
+                }
+                .stat-icon-wrapper.gray { background: #f1f5f9; color: #64748b; }
+                .stat-icon-wrapper.green { background: #f0fdf4; color: #166534; }
+                .stat-icon-wrapper.blue { background: #eff6ff; color: #1e40af; }
+                
+                .text-green { color: #166534; }
+                .text-blue { color: #1e40af; }
 
                 /* Daily Grid */
                 .daily-detail-card { background: #eef2ff; border: none; }
