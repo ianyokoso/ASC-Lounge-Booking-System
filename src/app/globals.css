@@ -37,8 +37,8 @@ body {
 
 /* Logo – 컨테이너 안에서 비율 유지하며 축소 */
 .nav-logo {
-  height: 80%;
-  width: 80%;
+  height: 50px;
+  width: 50px;
   object-fit: contain;
   display: block;
 }
