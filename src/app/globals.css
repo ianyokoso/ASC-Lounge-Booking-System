@@ -37,14 +37,14 @@ body {
 
 /* Logo – 컨테이너 안에서 비율 유지하며 축소 */
 .nav-logo {
-  height: 50px;
-  width: 50px;
+  height: 100px;
+  width: 100px;
   object-fit: contain;
   display: block;
 }
 
 .container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 60px 24px;
 }
