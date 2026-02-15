@@ -166,25 +166,23 @@ export default function BookingForm({
         )}
       </div>
 
+      {/* Messages */}
+      {error && (
+        <div className="alert alert-error">
+          <AlertCircle size={20} />
+          <span>{error}</span>
+        </div>
+      )}
+      {success && (
+        <div className="alert alert-success">
+          <CheckCircle2 size={20} />
+          <span>{success}</span>
+        </div>
+      )}
+
       <div className="booking-grid">
-        {/* Left Column: Calendar & Summary (Step 1 & 3) */}
-        <div className="main-content">
-
-          {/* Messages */}
-          {error && (
-            <div className="alert alert-error">
-              <AlertCircle size={20} />
-              <span>{error}</span>
-            </div>
-          )}
-          {success && (
-            <div className="alert alert-success">
-              <CheckCircle2 size={20} />
-              <span>{success}</span>
-            </div>
-          )}
-
-          {/* Step 1: Date */}
+        {/* Left Column: Calendar Only (Small) */}
+        <div className="left-side">
           <div className="step-card">
             <div className="step-header">
               <div className="step-number">01</div>
@@ -211,8 +209,27 @@ export default function BookingForm({
               </div>
             )}
           </div>
+        </div>
 
-          {/* Step 3: Summary & Confirmation (Moved from Sidebar) */}
+        {/* Right Column: Time & Summary */}
+        <div className="right-side">
+          {/* Step 2: Time */}
+          <div className={`step-card ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
+            <div className="step-header">
+              <div className="step-number">02</div>
+              <h3>시간 선택</h3>
+            </div>
+            <div className="time-selector-wrapper">
+              <TimeSelector
+                selectedSlot={selectedSlot}
+                onSelectSlot={setSelectedSlot}
+                disabledSlots={disabledSlots}
+                availableSlots={availableTimeSlots}
+              />
+            </div>
+          </div>
+
+          {/* Step 3: Summary & Confirmation */}
           <div className="summary-card-main">
             <div className="summary-header">
               <h3>예약 확정</h3>
@@ -244,38 +261,20 @@ export default function BookingForm({
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Right Column: Time Selection (Step 2) - Sticky Sidebar */}
-        <div className="sidebar">
-          <div className="sticky-sidebar">
-            {/* Step 2: Time */}
-            <div className={`step-card-sidebar ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
-              <div className="step-header">
-                <div className="step-number">02</div>
-                <h3>시간 선택</h3>
-              </div>
-              <div className="time-selector-wrapper">
-                <TimeSelector
-                  selectedSlot={selectedSlot}
-                  onSelectSlot={setSelectedSlot}
-                  disabledSlots={disabledSlots}
-                  availableSlots={availableTimeSlots}
-                />
-              </div>
-            </div>
-
-            <div className="notice-card">
-              <div className="notice-title">
-                <Info size={16} /> 이용 안내
-              </div>
-              <ul>
-                <li>예약은 3시간 단위입니다.</li>
-                <li>하루 최대 1회(3시간) 가능합니다.</li>
-                <li>평일 19시 이후 / 주말 상시 운영</li>
-              </ul>
-            </div>
-          </div>
+      {/* Notice Section Moved to Bottom */}
+      <div className="notice-section-full">
+        <div className="notice-header">
+          <Info size={18} style={{ color: '#d97706' }} />
+          <span>예약 이용 안내</span>
         </div>
+        <ul className="notice-list-horizontal">
+          <li>📌 예약은 3시간 단위입니다</li>
+          <li>📌 하루 최대 1회(3시간) 가능</li>
+          <li>📌 평일 19시 이후 / 주말 상시 운영</li>
+          <li>📌 권장사항: 일주일에 한 번 정도 이용을 권장합니다</li>
+        </ul>
       </div>
 
       {/* My Reservations Section */}
@@ -327,7 +326,7 @@ export default function BookingForm({
 
       <style jsx>{`
         .layout-container {
-          max-width: 1100px;
+          max-width: 1000px;
           margin: 0 auto;
           padding: 40px 20px;
           font-family: 'Pretendard', sans-serif;
@@ -338,12 +337,12 @@ export default function BookingForm({
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          margin-bottom: 50px;
+          margin-bottom: 40px;
           flex-wrap: wrap;
           gap: 20px;
         }
         .main-title {
-          font-size: 36px;
+          font-size: 32px;
           font-weight: 800;
           color: #1e293b;
           letter-spacing: -0.03em;
@@ -360,27 +359,27 @@ export default function BookingForm({
           background: white;
           border: 1px solid #e2e8f0;
           border-radius: 50px;
-          padding: 8px 16px 8px 8px;
+          padding: 6px 16px 6px 6px;
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
           box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         .user-info { display: flex; align-items: center; gap: 12px; }
         .avatar-circle {
-          width: 40px; height: 40px;
+          width: 36px; height: 36px;
           background: #4f46e5;
           color: white;
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
           font-weight: 700;
-          font-size: 18px;
+          font-size: 16px;
         }
         .user-text { display: flex; flex-direction: column; }
-        .user-name { font-weight: 700; font-size: 14px; color: #1e293b; }
+        .user-name { font-weight: 700; font-size: 13px; color: #1e293b; }
         .user-role { font-size: 11px; color: #64748b; font-weight: 600; display: flex; align-items: center; }
         .btn-logout { 
-          width: 36px; height: 36px; 
+          width: 32px; height: 32px; 
           border-radius: 50%; 
           border: 1px solid #f1f5f9; 
           display: flex; align-items: center; justify-content: center; 
@@ -390,96 +389,102 @@ export default function BookingForm({
         .btn-logout:hover { background: #fef2f2; color: #ef4444; border-color: #fee2e2; }
         .btn-login-header {
           background: #1e293b; color: white;
-          padding: 12px 24px; border-radius: 12px;
-          font-weight: 600; font-size: 14px;
+          padding: 10px 20px; border-radius: 12px;
+          font-weight: 600; font-size: 13px;
           transition: all 0.2s;
         }
         .btn-login-header:hover { background: #334155; transform: translateY(-1px); }
 
+        /* Alerts */
+        .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+        .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+
         /* Grid Layout */
         .booking-grid {
           display: grid;
-          grid-template-columns: 1fr 340px;
-          gap: 40px;
+          grid-template-columns: 400px 1fr; /* Fixed Width Calendar (Left), Flexible Right */
+          gap: 32px;
+          align-items: start;
         }
         @media (max-width: 900px) {
           .booking-grid { grid-template-columns: 1fr; }
-          .header-section { flex-direction: column; align-items: flex-start; }
         }
 
-        /* Steps */
+        /* Left Side (Calendar) */
+        .left-side {
+          display: flex; flex-direction: column;
+        }
+
+        /* Right Side (Time & Summary) */
+        .right-side {
+          display: flex; flex-direction: column; gap: 24px;
+        }
+
+        /* Steps & Cards */
         .step-card {
           background: white;
           border-radius: 24px;
-          padding: 32px;
-          margin-bottom: 32px;
+          padding: 28px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.02);
           border: 1px solid #f8fafc;
         }
-        .step-card-sidebar {
-          background: white;
-          border-radius: 24px;
-          padding: 24px;
-          margin-bottom: 24px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-          border: 1px solid #f1f5f9;
-        }
-        .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .step-number {
-          width: 32px; height: 32px;
+          width: 28px; height: 28px;
           background: #1e293b; color: white;
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
-          font-weight: 700; font-size: 14px;
+          font-weight: 700; font-size: 13px;
         }
-        .step-header h3 { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0; }
+        .step-header h3 { font-size: 18px; font-weight: 700; color: #1e293b; margin: 0; }
         .step-check { color: #10b981; margin-left: auto; }
 
         .selected-date-banner {
-          margin-top: 20px;
+          margin-top: 16px;
           background: #f8fafc;
-          padding: 16px;
+          padding: 14px;
           border-radius: 12px;
           display: flex; align-items: center; gap: 10px;
-          color: #1e293b; font-weight: 600;
+          color: #1e293b; font-weight: 600; font-size: 14px;
         }
 
         /* Summary Card (Main) */
         .summary-card-main {
           background: white;
           border-radius: 24px;
-          padding: 32px;
+          padding: 28px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.02);
           border: 1px solid #f8fafc;
         }
-        .summary-header h3 { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 24px; }
+        .summary-header h3 { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 20px; }
         
         .summary-body {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 24px;
-          margin-bottom: 32px;
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 24px;
           background: #f8fafc;
-          padding: 24px;
+          padding: 20px;
           border-radius: 16px;
+          gap: 16px;
         }
         @media (max-width: 600px) {
-           .summary-body { grid-template-columns: 1fr; }
+           .summary-body { flex-direction: column; }
         }
 
         .summary-item {
-          display: flex; flex-direction: column; gap: 8px;
+          display: flex; flex-direction: column; gap: 6px;
         }
-        .label { color: #64748b; font-size: 13px; font-weight: 500; }
-        .value { color: #1e293b; font-size: 16px; font-weight: 700; }
+        .label { color: #64748b; font-size: 12px; font-weight: 500; }
+        .value { color: #1e293b; font-size: 15px; font-weight: 700; }
 
         .btn-confirm-booking {
           width: 100%;
-          padding: 18px;
+          padding: 16px;
           background: #4f46e5;
           color: white;
-          border-radius: 16px;
-          font-size: 16px; font-weight: 700;
+          border-radius: 14px;
+          font-size: 15px; font-weight: 700;
           transition: all 0.2s;
           box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
@@ -492,25 +497,39 @@ export default function BookingForm({
         }
         .login-hint { text-align: center; color: #ef4444; font-size: 12px; margin-top: 10px; font-weight: 600; }
 
-        .notice-card {
-          margin-top: 24px;
+        /* Notice Section (Full Width Bottom) */
+        .notice-section-full {
+          margin-top: 40px;
           background: #fffbeb;
           border: 1px solid #fef3c7;
           border-radius: 16px;
-          padding: 20px;
+          padding: 24px;
         }
-        .notice-title {
-          font-size: 14px; font-weight: 700; color: #b45309;
-          display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+        .notice-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 700;
+          color: #b45309;
+          margin-bottom: 16px;
+          font-size: 15px;
         }
-        .notice-card ul { padding-left: 20px; margin: 0; }
-        .notice-card li { font-size: 13px; color: #92400e; margin-bottom: 6px; }
+        .notice-list-horizontal {
+          padding-left: 0; margin: 0; list-style: none;
+          display: flex; flex-wrap: wrap; gap: 20px;
+        }
+        .notice-list-horizontal li {
+          font-size: 13px; color: #92400e; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* Chrome/Edge bug fix for columns */
+        .time-selector-wrapper { min-height: 0; }
 
         /* My Reservations */
-        .my-reservations-section { margin-top: 80px; }
-        .section-heading { font-size: 24px; font-weight: 800; margin-bottom: 24px; color: #1e293b; }
+        .my-reservations-section { margin-top: 60px; border-top: 1px solid #f1f5f9; padding-top: 40px; }
+        .section-heading { font-size: 22px; font-weight: 800; margin-bottom: 24px; color: #1e293b; }
         .reservations-grid {
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
         }
         .reservation-card {
           background: white; border-radius: 16px;
@@ -521,27 +540,22 @@ export default function BookingForm({
         }
         .reservation-card:hover { transform: translateY(-2px); }
         .res-status-bar { height: 6px; background: #10b981; }
-        .res-content { padding: 24px; }
+        .res-content { padding: 20px; }
         .res-time-badge {
           display: inline-flex; align-items: center; gap: 6px;
           background: #f0fdf4; color: #15803d;
           padding: 6px 12px; border-radius: 20px;
           font-size: 12px; font-weight: 700; margin-bottom: 12px;
         }
-        .res-date-text { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 20px; }
+        .res-date-text { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
         .btn-cancel {
           width: 100%; padding: 10px;
           border: 1px solid #fee2e2; background: white;
           color: #ef4444; font-weight: 600; border-radius: 10px;
-          font-size: 14px; transition: all 0.2s;
+          font-size: 13px; transition: all 0.2s;
         }
         .btn-cancel:hover { background: #fee2e2; }
 
-        /* Alerts */
-        .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
-        .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-        .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
-        
         .badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; margin-left: auto; }
         .badge-holiday { background: #fef2f2; color: #dc2626; }
         .badge-weekend { background: #eff6ff; color: #2563eb; }
