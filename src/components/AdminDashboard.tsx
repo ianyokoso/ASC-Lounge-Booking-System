@@ -17,9 +17,10 @@ import { getSlotsForDate, isHoliday as checkIsHoliday } from "@/utils/timeSlots"
 
 interface AdminDashboardProps {
     initialReservations: any[];
+    isAdmin?: boolean;
 }
 
-export default function AdminDashboard({ initialReservations }: AdminDashboardProps) {
+export default function AdminDashboard({ initialReservations, isAdmin = false }: AdminDashboardProps) {
     const [reservations, setReservations] = useState<any[]>(initialReservations);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<string>("");
@@ -41,6 +42,30 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
             }
         } catch (err) {
             console.error("Failed to refresh reservations");
+        }
+    };
+
+    const handleCancel = async (id: string) => {
+        if (!confirm("정말 이 예약을 취소하시겠습니까?")) return;
+
+        try {
+            const res = await fetch(`/api/admin/reservations?id=${id}`, {
+                method: "DELETE",
+            });
+
+            if (res.ok) {
+                alert("예약이 취소되었습니다.");
+                // Optimistic update or refresh
+                setReservations(prev => prev.filter(r => r.id !== id));
+                // Optional: refresh from server to be sure
+                // fetchReservations(); 
+            } else {
+                const data = await res.json();
+                alert(data.error || "취소 실패");
+            }
+        } catch (err) {
+            console.error("Cancel error", err);
+            alert("처리 중 오류가 발생했습니다.");
         }
     };
 
@@ -252,7 +277,16 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                                         </div>
                                     </div>
                                     <div className="recent-status">
-                                        <span className="status-badge">예약 확정</span>
+                                        {isAdmin ? (
+                                            <button
+                                                onClick={() => handleCancel(r.id)}
+                                                className="btn-cancel"
+                                            >
+                                                취소
+                                            </button>
+                                        ) : (
+                                            <span className="status-badge">예약 확정</span>
+                                        )}
                                     </div>
                                 </div>
                             ))}
@@ -589,6 +623,21 @@ export default function AdminDashboard({ initialReservations }: AdminDashboardPr
                     .stats-row, .slots-grid { grid-template-columns: 1fr; }
                     .calendar-grid { font-size: 11px; }
                     .status-chip { font-size: 10px; padding: 2px 4px; }
+                }
+
+                .btn-cancel {
+                    background: #fee2e2;
+                    color: #ef4444;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .btn-cancel:hover {
+                    background: #fecaca;
                 }
             `}</style>
         </main>

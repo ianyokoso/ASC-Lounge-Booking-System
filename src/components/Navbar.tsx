@@ -70,7 +70,7 @@ export default function Navbar() {
                     border: '1px solid transparent',
                     lineHeight: '1'
                 }}>예약하기</Link>
-                <Link href="/admin" style={{
+                <Link href="/status" style={{
                     textDecoration: 'none',
                     color: '#3b82f6',
                     fontSize: '15px',

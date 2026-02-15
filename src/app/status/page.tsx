@@ -22,5 +22,5 @@ export default async function AdminPage() {
     // Serialize data to avoid "Date object" warning (if any)
     const serializedReservations = JSON.parse(JSON.stringify(reservations));
 
-    return <AdminDashboard initialReservations={serializedReservations} isAdmin={true} />;
+    return <AdminDashboard initialReservations={serializedReservations} />;
 }
