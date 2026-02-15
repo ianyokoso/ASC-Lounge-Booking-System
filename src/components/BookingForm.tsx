@@ -167,7 +167,7 @@ export default function BookingForm({
       </div>
 
       <div className="booking-grid">
-        {/* Left Column: Calendar & Time */}
+        {/* Left Column: Calendar & Summary (Step 1 & 3) */}
         <div className="main-content">
 
           {/* Messages */}
@@ -212,54 +212,55 @@ export default function BookingForm({
             )}
           </div>
 
-          {/* Step 2: Time */}
-          <div className={`step-card ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
-            <div className="step-header">
-              <div className="step-number">02</div>
-              <h3>시간 선택</h3>
+          {/* Step 3: Summary & Confirmation (Moved from Sidebar) */}
+          <div className="summary-card-main">
+            <div className="summary-header">
+              <h3>예약 확정</h3>
             </div>
-            <div className="time-selector-wrapper">
-              <TimeSelector
-                selectedSlot={selectedSlot}
-                onSelectSlot={setSelectedSlot}
-                disabledSlots={disabledSlots}
-                availableSlots={availableTimeSlots}
-              />
+            <div className="summary-body">
+              <div className="summary-item">
+                <span className="label">날짜</span>
+                <span className="value">{selectedDate || "-"}</span>
+              </div>
+              <div className="summary-item">
+                <span className="label">시간</span>
+                <span className="value">{selectedSlot || "-"}</span>
+              </div>
+              <div className="summary-item">
+                <span className="label">예약자</span>
+                <span className="value">{user?.username || "-"}</span>
+              </div>
+            </div>
+
+            <div className="summary-footer">
+              <button
+                className="btn-confirm-booking"
+                disabled={!selectedDate || !selectedSlot || loading || !user}
+                onClick={handleReservation}
+              >
+                {loading ? "처리중..." : "예약 확정하기"}
+              </button>
+              {!user && <p className="login-hint">* 로그인이 필요합니다</p>}
             </div>
           </div>
         </div>
 
-        {/* Right Column: Summary & Confirmation */}
+        {/* Right Column: Time Selection (Step 2) - Sticky Sidebar */}
         <div className="sidebar">
           <div className="sticky-sidebar">
-            <div className="summary-card">
-              <div className="summary-header">
-                <h3>예약 요약</h3>
+            {/* Step 2: Time */}
+            <div className={`step-card-sidebar ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
+              <div className="step-header">
+                <div className="step-number">02</div>
+                <h3>시간 선택</h3>
               </div>
-              <div className="summary-body">
-                <div className="summary-item">
-                  <span className="label">날짜</span>
-                  <span className="value">{selectedDate || "-"}</span>
-                </div>
-                <div className="summary-item">
-                  <span className="label">시간</span>
-                  <span className="value">{selectedSlot || "-"}</span>
-                </div>
-                <div className="summary-item">
-                  <span className="label">예약자</span>
-                  <span className="value">{user?.username || "-"}</span>
-                </div>
-              </div>
-
-              <div className="summary-footer">
-                <button
-                  className="btn-confirm-booking"
-                  disabled={!selectedDate || !selectedSlot || loading || !user}
-                  onClick={handleReservation}
-                >
-                  {loading ? "처리중..." : "예약 확정하기"}
-                </button>
-                {!user && <p className="login-hint">* 로그인이 필요합니다</p>}
+              <div className="time-selector-wrapper">
+                <TimeSelector
+                  selectedSlot={selectedSlot}
+                  onSelectSlot={setSelectedSlot}
+                  disabledSlots={disabledSlots}
+                  availableSlots={availableTimeSlots}
+                />
               </div>
             </div>
 
@@ -415,6 +416,14 @@ export default function BookingForm({
           box-shadow: 0 4px 20px rgba(0,0,0,0.02);
           border: 1px solid #f8fafc;
         }
+        .step-card-sidebar {
+          background: white;
+          border-radius: 24px;
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+          border: 1px solid #f1f5f9;
+        }
         .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
         .step-number {
           width: 32px; height: 32px;
@@ -435,23 +444,34 @@ export default function BookingForm({
           color: #1e293b; font-weight: 600;
         }
 
-        /* Sidebar & Summary */
-        .summary-card {
+        /* Summary Card (Main) */
+        .summary-card-main {
           background: white;
           border-radius: 24px;
-          padding: 30px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-          border: 1px solid #f1f5f9;
+          padding: 32px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+          border: 1px solid #f8fafc;
         }
-        .summary-header h3 { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 24px; }
+        .summary-header h3 { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 24px; }
+        
+        .summary-body {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 24px;
+          margin-bottom: 32px;
+          background: #f8fafc;
+          padding: 24px;
+          border-radius: 16px;
+        }
+        @media (max-width: 600px) {
+           .summary-body { grid-template-columns: 1fr; }
+        }
+
         .summary-item {
-          display: flex; justify-content: space-between;
-          margin-bottom: 16px; padding-bottom: 16px;
-          border-bottom: 1px dashed #e2e8f0;
+          display: flex; flex-direction: column; gap: 8px;
         }
-        .summary-item:last-child { border-bottom: none; }
-        .label { color: #64748b; font-size: 14px; font-weight: 500; }
-        .value { color: #1e293b; font-size: 15px; font-weight: 700; }
+        .label { color: #64748b; font-size: 13px; font-weight: 500; }
+        .value { color: #1e293b; font-size: 16px; font-weight: 700; }
 
         .btn-confirm-booking {
           width: 100%;
@@ -460,7 +480,6 @@ export default function BookingForm({
           color: white;
           border-radius: 16px;
           font-size: 16px; font-weight: 700;
-          margin-top: 20px;
           transition: all 0.2s;
           box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
