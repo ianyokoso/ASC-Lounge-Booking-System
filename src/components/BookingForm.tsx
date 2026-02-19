@@ -135,15 +135,6 @@ export default function BookingForm({
         <div className="header-content">
           <h1 className="main-title">ASC 구디 라운지 예약</h1>
           <p className="sub-title">편안한 공간에서 최고의 집중을 경험하세요</p>
-          <a
-            href="https://mellow-melon-4ac.notion.site/ASC-3056400e926880e6975aeb71c204cc0b?source=copy_link"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="notion-link"
-          >
-            <ExternalLink size={14} />
-            라운지 이용 규칙 및 다른 라운지 안내
-          </a>
         </div>
 
         {user ? (
@@ -274,18 +265,6 @@ export default function BookingForm({
       </div>
 
       {/* Notice Section Moved to Bottom */}
-      <div className="notice-section-full">
-        <div className="notice-header">
-          <Info size={18} style={{ color: '#d97706' }} />
-          <span>예약 이용 안내</span>
-        </div>
-        <ul className="notice-list-horizontal">
-          <li>📌 예약은 3시간 단위입니다</li>
-          <li>📌 하루 최대 1회(3시간) 가능</li>
-          <li>📌 평일 19시 이후 / 주말 상시 운영</li>
-          <li>📌 권장사항: 일주일에 한 번 정도 이용을 권장합니다</li>
-        </ul>
-      </div>
 
       {/* My Reservations Section */}
       {user && reservations.filter((r) => r.userId === user.id).length > 0 && (

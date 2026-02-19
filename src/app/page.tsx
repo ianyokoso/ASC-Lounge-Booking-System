@@ -134,11 +134,81 @@ export default function Home() {
                 ))}
             </div>
 
+            <div className="notice-section-full">
+                <div className="notice-header">
+                    <span style={{ fontSize: "18px" }}>ℹ️</span>
+                    <span>예약 이용 규칙 안내</span>
+                </div>
+                <ul className="notice-list-horizontal">
+                    <li>📌 예약은 3시간 단위입니다</li>
+                    <li>📌 하루 최대 1회(3시간) 가능</li>
+                    <li>📌 평일 19시 이후 / 주말 상시 운영</li>
+                    <li>📌 권장사항: 일주일에 한 번 정도 이용을 권장합니다</li>
+                </ul>
+            </div>
+
+            <a
+                href="https://mellow-melon-4ac.notion.site/ASC-3056400e926880e6975aeb71c204cc0b?source=copy_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="notion-link-button"
+            >
+                <span style={{ marginRight: '8px' }}>🔗</span>
+                라운지 이용 규칙 및 다른 라운지 안내
+            </a>
+
             <style jsx global>{`
+        .notion-link-button {
+          margin-top: 20px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 12px 24px;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          color: #475569;
+          font-weight: 600;
+          text-decoration: none;
+          transition: all 0.2s;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .notion-link-button:hover {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+          transform: translateY(-1px);
+        }
+
         .location-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
           border-color: #cbd5e1 !important;
+        }
+        
+        .notice-section-full {
+          margin-top: 40px;
+          background: #fffbeb;
+          border: 1px solid #fef3c7;
+          border-radius: 16px;
+          padding: 24px;
+          width: 100%;
+          max-width: 600px;
+        }
+        .notice-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 700;
+          color: #b45309;
+          margin-bottom: 16px;
+          font-size: 15px;
+        }
+        .notice-list-horizontal {
+          padding-left: 0; margin: 0; list-style: none;
+          display: flex; flex-direction: column; gap: 10px;
+        }
+        .notice-list-horizontal li {
+          font-size: 14px; color: #92400e; display: flex; align-items: center; gap: 6px;
         }
       `}</style>
         </main>
