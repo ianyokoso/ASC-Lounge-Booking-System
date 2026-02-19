@@ -17,7 +17,7 @@ import {
   ShieldCheck,
   ExternalLink,
 } from "lucide-react";
-import { getSlotsForDate, isWeekendOrHoliday, isHoliday } from "@/utils/timeSlots";
+import { getSlotsForDate, isWeekendOrHoliday, isHoliday, formatKoreanDate } from "@/utils/timeSlots";
 
 interface BookingFormProps {
   initialAvailability: Record<string, string[]>;
@@ -203,7 +203,7 @@ export default function BookingForm({
             {selectedDate && (
               <div className="selected-date-banner">
                 <CalendarIcon size={16} />
-                <span>{selectedDate}</span>
+                <span>{formatKoreanDate(selectedDate)}</span>
                 <div className={`badge ${isHoliday(selectedDate) ? "badge-holiday" : isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
                   {isHoliday(selectedDate) ? "공휴일" : isWeekend(selectedDate) ? "주말" : "평일"}
                 </div>
@@ -238,7 +238,7 @@ export default function BookingForm({
             <div className="summary-body">
               <div className="summary-item">
                 <span className="label">날짜</span>
-                <span className="value">{selectedDate || "-"}</span>
+                <span className="value">{formatKoreanDate(selectedDate) || "-"}</span>
               </div>
               <div className="summary-item">
                 <span className="label">시간</span>
@@ -291,11 +291,11 @@ export default function BookingForm({
                 <div key={r.id} className="reservation-card">
                   <div className="res-status-bar"></div>
                   <div className="res-content">
+                    <div className="res-date-text">
+                      {formatKoreanDate(r.date)}
+                    </div>
                     <div className="res-time-badge">
                       <Clock size={14} /> {r.timeSlot}
-                    </div>
-                    <div className="res-date-text">
-                      {r.date}
                     </div>
                     <button
                       className="btn-cancel"
