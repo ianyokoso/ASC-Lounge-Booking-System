@@ -189,122 +189,24 @@ export default function BookingForm({
 
       <div className="booking-grid">
         {/* Left Column: Calendar Only (Small) */}
-        <div className="left-side">
-          <div className="step-card">
-            <div className="step-header">
-              <div className="step-number">01</div>
-              <h3>날짜 선택</h3>
-              {selectedDate && <span className="step-check"><CheckCircle2 size={18} /></span>}
-            </div>
-            <div className="calendar-wrapper">
-              <Calendar
-                selectedDate={selectedDate}
-                onSelectDate={(date) => {
-                  setSelectedDate(date);
-                  setSelectedSlot("");
-                  setError("");
-                }}
-              />
-            </div>
-            {selectedDate && (
-              <div className="selected-date-banner">
-                <CalendarIcon size={16} />
-                <span>{formatKoreanDate(selectedDate)}</span>
-                <div className={`badge ${isHoliday(selectedDate) ? "badge-holiday" : isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
-                  {isHoliday(selectedDate) ? "공휴일" : isWeekend(selectedDate) ? "주말" : "평일"}
-                </div>
-              </div>
             )}
-          </div>
-        </div>
-
-        {/* Right Column: Time & Summary */}
-        <div className="right-side">
-          {/* Step 2: Time */}
-          <div className={`step-card ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
-            <div className="step-header">
-              <div className="step-number">02</div>
-              <h3>시간 선택</h3>
-            </div>
-            <div className="time-selector-wrapper">
-              <TimeSelector
-                selectedSlot={selectedSlot}
-                onSelectSlot={setSelectedSlot}
-                disabledSlots={disabledSlots}
-                availableSlots={availableTimeSlots}
-              />
-            </div>
-          </div>
-
-          {/* Step 3: Summary & Confirmation */}
-          <div className="summary-card-main">
-            <div className="summary-header">
-              <h3>예약 확정</h3>
-            </div>
-            <div className="summary-body">
-              <div className="summary-item">
-                <span className="label">날짜</span>
-                <span className="value">{formatKoreanDate(selectedDate) || "-"}</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">시간</span>
-                <span className="value">{selectedSlot || "-"}</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">예약자</span>
-                <span className="value">{user?.username || "-"}</span>
-              </div>
-            </div>
-
-            <div className="summary-footer">
-              <button
-                className="btn-confirm-booking"
-                disabled={!selectedDate || !selectedSlot || loading || !user}
-                onClick={handleReservation}
-              >
-                {loading ? "처리중..." : "예약 확정하기"}
-              </button>
-              {!user && <p className="login-hint">* 로그인이 필요합니다</p>}
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Notice Section Moved to Bottom */}
-
-      <div className="notice-section-full">
-        <div className="notice-header">
-          <Info size={18} style={{ color: '#d97706' }} />
-          <span>예약 이용 안내</span>
-        </div>
-        <ul className="notice-list-horizontal">
-          <li>📌 예약은 3시간 단위입니다</li>
-          <li>📌 하루 최대 1회(3시간) 가능</li>
-          <li>📌 평일 19시 이후 / 주말 상시 운영</li>
-          <li>📌 권장사항: 일주일에 한 번 정도 이용을 권장합니다</li>
-        </ul>
-      </div>
-
-      {/* My Reservations Section */}
+      {/* My Reservations Section - Moved from bottom */}
       {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
-        <div className="my-reservations-section">
-          <h2 className="section-heading">나의 예약 현황</h2>
-          <div className="reservations-grid">
+        <div className="my-reservations-sidebar">
+          <h2 className="sidebar-heading">나의 예약 현항</h2>
+          <div className="reservations-stack">
             {reservations
               .filter((r) => r.userId === user.id)
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // 최신순
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((r) => (
-                <div key={r.id} className="reservation-card">
-                  <div className="res-status-bar"></div>
-                  <div className="res-content">
-                    <div className="res-date-text">
-                      {formatKoreanDate(r.date)}
-                    </div>
-                    <div className="res-time-badge">
-                      <Clock size={14} /> {r.timeSlot}
-                    </div>
+                <div key={r.id} className="mini-res-card">
+                  <div className="mini-res-content">
+                    <div className="mini-res-date">{formatKoreanDate(r.date)}</div>
+                    <div className="mini-res-time"><Clock size={12} /> {r.timeSlot}</div>
                     <button
-                      className="btn-cancel"
+                      className="btn-cancel-mini-text"
                       onClick={async () => {
                         if (!confirm("예약을 취소하시겠습니까?")) return;
                         await fetch("/api/reservations", {
@@ -324,8 +226,82 @@ export default function BookingForm({
           </div>
         </div>
       )}
+    </div>
 
-      {showAuthModal && (
+        {/* Right Column: Time & Summary */ }
+  <div className="right-side">
+    {/* Step 2: Time */}
+    <div className={`step-card time-section-card ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
+      <div className="step-header">
+        <div className="step-number">02</div>
+        <h3>시간 선택</h3>
+      </div>
+      <div className="time-selector-wrapper">
+        <TimeSelector
+          selectedSlot={selectedSlot}
+          onSelectSlot={setSelectedSlot}
+          disabledSlots={disabledSlots}
+          availableSlots={availableTimeSlots}
+        />
+      </div>
+    </div>
+
+    {/* Step 3: Summary & Confirmation */}
+    <div className="summary-card-main">
+      <div className="summary-header">
+        <h3>예약 확정</h3>
+      </div>
+      <div className="summary-body">
+        <div className="summary-item">
+          <span className="label">날짜</span>
+          <span className="value">{formatKoreanDate(selectedDate) || "-"}</span>
+        </div>
+        <div className="summary-item">
+          <span className="label">시간</span>
+          <span className="value">{selectedSlot || "-"}</span>
+        </div>
+        <div className="summary-item">
+          <span className="label">예약자</span>
+          <span className="value">{user?.username || "-"}</span>
+        </div>
+      </div>
+
+      <div className="summary-footer">
+        <button
+          className="btn-confirm-booking"
+          disabled={!selectedDate || !selectedSlot || loading || !user}
+          onClick={handleReservation}
+        >
+          {loading ? "처리중..." : "예약 확정하기"}
+        </button>
+        {!user && <p className="login-hint">* 로그인이 필요합니다</p>}
+      </div>
+    </div>
+  </div>
+      </div >
+
+    {/* Notice Section Moved to Bottom */ }
+
+    < div className = "notice-section-full" >
+        <div className="notice-header">
+          <Info size={18} style={{ color: '#d97706' }} />
+          <span>예약 이용 안내</span>
+        </div>
+        <ul className="notice-list-horizontal">
+          <li>📌 예약은 3시간 단위입니다</li>
+          <li>📌 하루 최대 1회(3시간) 가능</li>
+          <li>📌 평일 19시 이후 / 주말 상시 운영</li>
+          <li>📌 권장사항: 일주일에 한 번 정도 이용을 권장합니다</li>
+        </ul>
+      </div >
+
+      </div >
+
+    {/* Notice Section Moved to Bottom */ }
+
+    < div className = "notice-section-full" >
+
+      { showAuthModal && (
         <AuthModal
           onSuccess={(u) => {
             setUser(u);
@@ -334,9 +310,10 @@ export default function BookingForm({
           }}
           onClose={() => setShowAuthModal(false)}
         />
-      )}
+      )
+}
 
-      <style jsx>{`
+<style jsx>{`
         .layout-container {
           max-width: 1000px;
           margin: 0 auto;
@@ -553,44 +530,76 @@ export default function BookingForm({
         }
 
         /* Chrome/Edge bug fix for columns */
-        .time-selector-wrapper { min-height: 0; }
+        .time-selector-wrapper { min-height: 0; flex: 1; }
 
-        /* My Reservations */
-        .my-reservations-section { margin-top: 60px; border-top: 1px solid #f1f5f9; padding-top: 40px; }
-        .section-heading { font-size: 22px; font-weight: 800; margin-bottom: 24px; color: #1e293b; }
-        .reservations-grid {
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+        .time-section-card {
+           display: flex;
+           flex-direction: column;
+           height: 520px; /* Exact height for desktop alignment */
         }
-        .reservation-card {
-          background: white; border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        @media (max-width: 900px) {
+          .time-section-card { height: auto; min-height: 400px; }
+        }
+
+        /* Sidebar Reservations */
+        .my-reservations-sidebar {
+          margin-top: 24px;
+        }
+        .sidebar-heading {
+          font-size: 16px;
+          font-weight: 700;
+          color: #1e293b;
+          margin-bottom: 12px;
+          padding-left: 4px;
+        }
+        .reservations-stack {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .mini-res-card {
+          background: white;
+          border-radius: 16px;
           border: 1px solid #f1f5f9;
-          transition: transform 0.2s;
+          padding: 16px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
-        .reservation-card:hover { transform: translateY(-2px); }
-        .res-status-bar { height: 6px; background: #10b981; }
-        .res-content { padding: 20px; }
-        .res-time-badge {
-          display: inline-flex; align-items: center; gap: 6px;
-          background: #f0fdf4; color: #15803d;
-          padding: 6px 12px; border-radius: 20px;
-          font-size: 12px; font-weight: 700; margin-bottom: 12px;
+        .mini-res-date {
+          font-weight: 700;
+          font-size: 14px;
+          color: #1e293b;
+          margin-bottom: 6px;
         }
-        .res-date-text { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
-        .btn-cancel {
-          width: 100%; padding: 10px;
-          border: 1px solid #fee2e2; background: white;
-          color: #ef4444; font-weight: 600; border-radius: 10px;
-          font-size: 13px; transition: all 0.2s;
+        .mini-res-time {
+          font-size: 11px;
+          color: #64748b;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          margin-bottom: 12px;
         }
-        .btn-cancel:hover { background: #fee2e2; }
+        .btn-cancel-mini-text {
+          font-size: 12px;
+          color: #ef4444;
+          font-weight: 600;
+          background: #fff1f2;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 8px;
+          width: 100%;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-cancel-mini-text:hover {
+          background: #fee2e2;
+        }
 
         .badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; margin-left: auto; }
         .badge-holiday { background: #fef2f2; color: #dc2626; }
         .badge-weekend { background: #eff6ff; color: #2563eb; }
         .badge-weekday { background: #f1f5f9; color: #64748b; }
       `}</style>
-    </div>
+    </div >
   );
 }
