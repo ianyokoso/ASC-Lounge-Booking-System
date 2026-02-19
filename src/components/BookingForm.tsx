@@ -266,6 +266,19 @@ export default function BookingForm({
 
       {/* Notice Section Moved to Bottom */}
 
+      <div className="notice-section-full">
+        <div className="notice-header">
+          <Info size={18} style={{ color: '#d97706' }} />
+          <span>예약 이용 안내</span>
+        </div>
+        <ul className="notice-list-horizontal">
+          <li>📌 예약은 3시간 단위입니다</li>
+          <li>📌 하루 최대 1회(3시간) 가능</li>
+          <li>📌 평일 19시 이후 / 주말 상시 운영</li>
+          <li>📌 권장사항: 일주일에 한 번 정도 이용을 권장합니다</li>
+        </ul>
+      </div>
+
       {/* My Reservations Section */}
       {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
         <div className="my-reservations-section">
