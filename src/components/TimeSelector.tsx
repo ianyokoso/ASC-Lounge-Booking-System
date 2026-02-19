@@ -84,6 +84,8 @@ export default function TimeSelector({
           display: grid;
           grid-template-columns: repeat(2, 1fr); /* 2 columns for wide buttons */
           gap: 12px;
+          height: 100%; /* Fill available space */
+          align-content: start; /* Align items to start, don't stretch vertically excessively */
         }
         @media (max-width: 640px) {
           .time-cards-grid {
@@ -93,8 +95,8 @@ export default function TimeSelector({
         .time-card {
           background: white;
           border: 1px solid #e2e8f0;
-          padding: 14px 20px;
-          border-radius: 12px;
+          padding: 16px 24px; /* Increased padding */
+          border-radius: 16px; /* More rounded */
           cursor: pointer;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
@@ -102,26 +104,27 @@ export default function TimeSelector({
           align-items: center;
           position: relative;
           overflow: hidden;
-          min-height: 54px;
+          min-height: 64px; /* Taller touch target */
         }
         .time-card:hover:not(.disabled):not(.selected) {
-          border-color: #94a3b8;
+          border-color: #64748b; /* Darker hover border */
           background: #f8fafc;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.08); /* Stronger shadow */
         }
         .time-card.selected {
-          border-color: #1e293b;
-          background: #1e293b; /* Deep Navy */
+          border-color: #0f172a; /* Black/Dark Navy border */
+          background: #0f172a; /* Black/Dark Navy bg */
           color: white;
-          box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
-          transform: scale(1.01);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+          transform: scale(1.02);
+          z-index: 10;
         }
         .time-card.disabled {
-          background: #f8fafc;
+          background: #f1f5f9;
           color: #cbd5e1;
           cursor: not-allowed;
-          border-color: #f1f5f9;
+          border-color: #e2e8f0;
         }
         .time-card.loading {
           background: #f8fafc;
@@ -131,18 +134,24 @@ export default function TimeSelector({
           opacity: 0.8;
         }
         .time-range {
-          font-weight: 700;
-          font-size: 15px;
-          color: inherit;
-          letter-spacing: -0.01em;
+          font-weight: 800; /* Extra bold */
+          font-size: 16px; /* Larger text */
+          color: #1e293b;
+          letter-spacing: -0.02em;
+        }
+        .time-card.selected .time-range {
+          color: white;
+        }
+        .time-card.disabled .time-range {
+          color: #94a3b8;
         }
         .status-label {
-          font-size: 12px;
-          font-weight: 500;
-          opacity: 0.7;
+          font-size: 13px;
+          font-weight: 600;
+          color: #64748b;
         }
         .time-card.selected .status-label {
-          opacity: 0.9;
+          color: #94a3b8; /* Lighter text on dark bg */
           font-weight: 600;
         }
         .empty-slots {

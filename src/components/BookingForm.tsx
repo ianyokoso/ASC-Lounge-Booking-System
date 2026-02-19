@@ -423,6 +423,9 @@ export default function BookingForm({
           padding: 28px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.02);
           border: 1px solid #f8fafc;
+          min-height: 560px; /* Enforce consistent height */
+          display: flex;
+          flex-direction: column;
         }
         .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .step-number {
@@ -448,12 +451,14 @@ export default function BookingForm({
         .time-section-card {
            display: flex;
            flex-direction: column;
-           height: 520px; /* Aligns with Step 01 on Desktop */
+           /* height: 520px; Removed in favor of min-height on step-card */
+           flex: 1; 
         }
-        .time-selector-wrapper { min-height: 0; flex: 1; }
+        .time-selector-wrapper { min-height: 0; }
         
         @media (max-width: 900px) {
-          .time-section-card { height: auto; min-height: 400px; }
+          .time-section-card { min-height: 400px; }
+          .step-card { min-height: auto; } /* Reset min-height on mobile */
         }
 
         /* Sidebar Reservations */
