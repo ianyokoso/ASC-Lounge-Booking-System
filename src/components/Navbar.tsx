@@ -38,23 +38,28 @@ export default function Navbar() {
             top: 0,
             zIndex: 1000
         }}>
-            <div
-                role="img"
-                aria-label="ASC Logo"
-                style={{
-                    width: '60px',
-                    height: '60px',
-                    flexShrink: 0,
-                    marginRight: '20px',
-                    backgroundImage: 'url(https://i.imgur.com/kA9tM7m.png)',
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                }}
-            />
+            <Link href="/" style={{ marginRight: '20px' }}>
+                <div
+                    role="img"
+                    aria-label="ASC Logo"
+                    style={{
+                        width: '60px',
+                        height: '60px',
+                        flexShrink: 0,
+                        backgroundImage: 'url(https://i.imgur.com/kA9tM7m.png)',
+                        backgroundSize: 'contain',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        cursor: 'pointer'
+                    }}
+                />
+            </Link>
             <div style={{
                 height: '100%',
-                flexShrink: 0
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
             }}>
                 <Link href="/guro" style={{
                     textDecoration: 'none',
