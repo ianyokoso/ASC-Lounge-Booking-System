@@ -1,53 +1,67 @@
 import { prisma } from "@/lib/prisma";
 import BookingForm from "@/components/BookingForm";
 import { cookies } from "next/headers";
-import { Info } from "lucide-react";
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
+
+// 가용성 데이터 캐싱 (60초)
+const getCachedAvailabilityMap = unstable_cache(
+  async () => {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+    const allReservations = await prisma.reservation.findMany({
+      where: {
+        date: {
+          gte: todayStr,
+        },
+      },
+      select: {
+        date: true,
+        timeSlot: true,
+      },
+    });
+
+    const availabilityMap: Record<string, string[]> = {};
+    allReservations.forEach((r: { date: string; timeSlot: string }) => {
+      if (!availabilityMap[r.date]) {
+        availabilityMap[r.date] = [];
+      }
+      availabilityMap[r.date].push(r.timeSlot);
+    });
+    return availabilityMap;
+  },
+  ["availability-map"],
+  { revalidate: 60, tags: ["reservations"] }
+);
 
 async function getInitialData() {
   const cookieStore = await cookies();
   const userId = cookieStore.get("userId")?.value;
 
-  // 1. 유저 정보 조회
-  let user = null;
-  if (userId) {
-    user = await prisma.user.findUnique({
+  // 병렬 쿼리 실행
+  const userPromise = userId
+    ? prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, username: true, name: true, discordId: true },
-    });
-  }
+    })
+    : Promise.resolve(null);
 
-  // 2. 미래의 모든 예약 조회 (가용성 맵 생성)
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const availabilityMapPromise = getCachedAvailabilityMap();
 
-  const allReservations = await prisma.reservation.findMany({
-    where: {
-      date: {
-        gte: todayStr,
-      },
-    },
-    select: {
-      date: true,
-      timeSlot: true,
-    },
-  });
-
-  const availabilityMap: Record<string, string[]> = {};
-  allReservations.forEach((r) => {
-    if (!availabilityMap[r.date]) {
-      availabilityMap[r.date] = [];
-    }
-    availabilityMap[r.date].push(r.timeSlot);
-  });
-
-  // 3. 내 예약 목록 조회 (로그인 시)
-  let myReservations: any[] = [];
-  if (userId) {
-    myReservations = await prisma.reservation.findMany({
+  const myReservationsPromise = userId
+    ? prisma.reservation.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
-    });
-  }
+      take: 10, // 초기 로딩용으로 최근 10개만 제한 (성능)
+    })
+    : Promise.resolve([]);
+
+  const [user, availabilityMap, myReservations] = await Promise.all([
+    userPromise,
+    availabilityMapPromise,
+    myReservationsPromise,
+  ]);
 
   return {
     user,
