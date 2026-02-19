@@ -134,8 +134,6 @@ export default function Home() {
                 ))}
             </div>
 
-            </div>
-
             <a
                 href="https://mellow-melon-4ac.notion.site/ASC-3056400e926880e6975aeb71c204cc0b?source=copy_link"
                 target="_blank"
