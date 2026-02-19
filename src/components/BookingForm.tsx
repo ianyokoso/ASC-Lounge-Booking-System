@@ -44,7 +44,7 @@ export default function BookingForm({
 
   const fetchReservations = async () => {
     try {
-      const res = await fetch("/api/reservations");
+      const res = await fetch("/api/reservations", { cache: 'no-store' });
       const data = await res.json();
       if (Array.isArray(data.reservations)) {
         setReservations(data.reservations);
@@ -329,7 +329,11 @@ export default function BookingForm({
 
       {showAuthModal && (
         <AuthModal
-          onSuccess={(u) => { setUser(u); setShowAuthModal(false); }}
+          onSuccess={(u) => {
+            setUser(u);
+            setShowAuthModal(false);
+            fetchReservations(); // [FIX] Fetch reservations immediately after login
+          }}
           onClose={() => setShowAuthModal(false)}
         />
       )}
