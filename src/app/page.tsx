@@ -147,24 +147,26 @@ export default function Home() {
 
             <style jsx global>{`
         .notion-link-button {
-          margin-top: 20px;
+          margin-top: 40px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 12px 24px;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
-          color: #475569;
-          font-weight: 600;
+          padding: 14px 28px;
+          background: #fffbeb;
+          border: 2px solid #fde68a;
+          border-radius: 16px;
+          color: #92400e;
+          font-weight: 700;
           text-decoration: none;
           transition: all 0.2s;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          font-size: 15px;
         }
         .notion-link-button:hover {
-          background: #f8fafc;
-          border-color: #cbd5e1;
-          transform: translateY(-1px);
+          background: #fef3c7;
+          border-color: #fcd34d;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         .location-card:hover {
