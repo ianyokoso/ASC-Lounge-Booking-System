@@ -149,7 +149,7 @@ export default function BookingForm({
               </div>
             </div>
             <button
-              className="btn-logout"
+              className="btn-logout-pill"
               onClick={async () => {
                 try {
                   await fetch("/api/auth/logout", { method: "POST" });
@@ -157,7 +157,8 @@ export default function BookingForm({
                 } catch (error) { console.error("Logout failed", error); }
               }}
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
+              <span>로그아웃</span>
             </button>
           </div>
         ) : (
@@ -380,15 +381,21 @@ export default function BookingForm({
         .user-text { display: flex; flex-direction: column; }
         .user-name { font-weight: 700; font-size: 13px; color: #1e293b; }
         .user-role { font-size: 11px; color: #64748b; font-weight: 600; display: flex; align-items: center; }
-        .btn-logout { 
-          width: 32px; height: 32px; 
-          border-radius: 50%; 
-          border: 1px solid #f1f5f9; 
-          display: flex; align-items: center; justify-content: center; 
-          color: #94a3b8;
+        .btn-logout-pill {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 12px;
+          border-radius: 20px;
+          border: 1px solid #e2e8f0;
+          background: #f8fafc;
+          color: #64748b;
+          font-size: 12px;
+          font-weight: 600;
           transition: all 0.2s;
+          margin-left: 4px;
         }
-        .btn-logout:hover { background: #fef2f2; color: #ef4444; border-color: #fee2e2; }
+        .btn-logout-pill:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
         .btn-login-header {
           background: #1e293b; color: white;
           padding: 10px 20px; border-radius: 12px;
