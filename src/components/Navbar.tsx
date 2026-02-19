@@ -53,13 +53,10 @@ export default function Navbar() {
                 }}
             />
             <div style={{
-                display: 'flex',
-                gap: '24px',
-                alignItems: 'center',
                 height: '100%',
                 flexShrink: 0
             }}>
-                <Link href="/" style={{
+                <Link href="/guro" style={{
                     textDecoration: 'none',
                     color: '#334155',
                     fontSize: '15px',
@@ -70,7 +67,7 @@ export default function Navbar() {
                     border: '1px solid transparent',
                     lineHeight: '1'
                 }}>예약하기</Link>
-                <Link href="/status" style={{
+                <Link href="/guro/status" style={{
                     textDecoration: 'none',
                     color: '#3b82f6',
                     fontSize: '15px',
@@ -87,6 +84,6 @@ export default function Navbar() {
                     boxShadow: '0 2px 4px rgba(59, 130, 246, 0.05)'
                 }}>전체예약현황보기</Link>
             </div>
-        </nav>
+        </nav >
     );
 }
