@@ -119,7 +119,13 @@ export default function BookingForm({
       setSuccess("라운지 예약이 확정되었습니다!");
       setSelectedSlot("");
 
-      fetchReservations();
+      // 서버에서 돌려받은 예약 객체를 즉시 리스트에 추가 (Optimistic UI)
+      if (data.reservation) {
+        setReservations(prev => [data.reservation, ...prev]);
+      } else {
+        fetchReservations();
+      }
+
       fetchAllAvailability();
     } catch (err: any) {
       setError(err.message);
