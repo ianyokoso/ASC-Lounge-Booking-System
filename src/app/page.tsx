@@ -134,17 +134,6 @@ export default function Home() {
                 ))}
             </div>
 
-            <div className="notice-section-full">
-                <div className="notice-header">
-                    <span style={{ fontSize: "18px" }}>ℹ️</span>
-                    <span>예약 이용 규칙 안내</span>
-                </div>
-                <ul className="notice-list-horizontal">
-                    <li>📌 예약은 3시간 단위입니다</li>
-                    <li>📌 하루 최대 1회(3시간) 가능</li>
-                    <li>📌 평일 19시 이후 / 주말 상시 운영</li>
-                    <li>📌 권장사항: 일주일에 한 번 정도 이용을 권장합니다</li>
-                </ul>
             </div>
 
             <a
@@ -154,7 +143,7 @@ export default function Home() {
                 className="notion-link-button"
             >
                 <span style={{ marginRight: '8px' }}>🔗</span>
-                라운지 이용 규칙 및 다른 라운지 안내
+                라운지 이용 규칙 안내
             </a>
 
             <style jsx global>{`
@@ -211,6 +200,6 @@ export default function Home() {
           font-size: 14px; color: #92400e; display: flex; align-items: center; gap: 6px;
         }
       `}</style>
-        </main>
+        </main >
     );
 }
