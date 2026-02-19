@@ -23,7 +23,7 @@ export default function Home() {
 
     const locations = [
         {
-            name: "구로디지털단지",
+            name: "구디 라운지",
             desc: "ASC Guro Lounge",
             href: "/guro",
             isExternal: false,
@@ -31,7 +31,7 @@ export default function Home() {
             bgColor: "#eef2ff",
         },
         {
-            name: "안국역",
+            name: "안국 라운지",
             desc: "Ankuk Station",
             href: "https://m.booking.naver.com/booking/6/bizes/715955/items/7031202?area=pll&lang=ko&startDate=2025-09-01&theme=place",
             isExternal: true,
@@ -39,7 +39,7 @@ export default function Home() {
             bgColor: "#ecfdf5",
         },
         {
-            name: "강남",
+            name: "강남 라운지",
             desc: "Gangnam Lounge",
             href: "https://eggstation.spacebring.com/suite/organizations",
             isExternal: true,
