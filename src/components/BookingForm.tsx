@@ -121,6 +121,14 @@ export default function BookingForm({
       }
 
       fetchAllAvailability();
+
+      // Mobile UX: Scroll to My Reservations after booking
+      setTimeout(() => {
+        const reservationsSection = document.getElementById("my-reservations-sidebar");
+        if (reservationsSection) {
+          reservationsSection.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 300); // Slight delay to ensure DOM render
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -214,7 +222,7 @@ export default function BookingForm({
 
           {/* My Reservations Sidebar - Moved to Left */}
           {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
-            <div className="my-reservations-sidebar">
+            <div id="my-reservations-sidebar" className="my-reservations-sidebar">
               <h2 className="sidebar-heading">나의 예약 현황</h2>
               <div className="reservations-stack">
                 {reservations
