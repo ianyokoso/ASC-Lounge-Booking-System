@@ -50,7 +50,8 @@ export default function Navbar() {
                         backgroundSize: 'contain',
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        borderRadius: '12px'
                     }}
                 />
             </Link>
@@ -87,7 +88,7 @@ export default function Navbar() {
                     border: '1px solid #dbeafe',
                     lineHeight: '1',
                     boxShadow: '0 2px 4px rgba(59, 130, 246, 0.05)'
-                }}>전체예약현황보기</Link>
+                }}>전체 예약 현황 보기</Link>
             </div>
         </nav >
     );

@@ -69,7 +69,8 @@ export default function Home() {
                         backgroundImage: "url(https://i.imgur.com/kA9tM7m.png)",
                         backgroundSize: "contain",
                         backgroundRepeat: "no-repeat",
-                        backgroundPosition: "center"
+                        backgroundPosition: "center",
+                        borderRadius: "16px"
                     }}
                 />
                 <h1 style={{
