@@ -12,12 +12,9 @@ import {
   CheckCircle2,
   Info,
   LogOut,
-  Trash2,
-  ChevronRight,
   ShieldCheck,
-  ExternalLink,
 } from "lucide-react";
-import { getSlotsForDate, isWeekendOrHoliday, isHoliday } from "@/utils/timeSlots";
+import { getSlotsForDate, isWeekendOrHoliday, isHoliday, formatKoreanDate } from "@/utils/timeSlots";
 
 interface BookingFormProps {
   initialAvailability: Record<string, string[]>;
@@ -44,7 +41,7 @@ export default function BookingForm({
 
   const fetchReservations = async () => {
     try {
-      const res = await fetch("/api/reservations");
+      const res = await fetch("/api/reservations", { cache: 'no-store' });
       const data = await res.json();
       if (Array.isArray(data.reservations)) {
         setReservations(data.reservations);
@@ -100,8 +97,6 @@ export default function BookingForm({
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // User info is implicitly handled by the backend session or existing user data
-        // We still send the name/discordId if the backend expects it, but we use the user object directly
         body: JSON.stringify({
           date: selectedDate,
           timeSlot: selectedSlot,
@@ -119,8 +114,21 @@ export default function BookingForm({
       setSuccess("라운지 예약이 확정되었습니다!");
       setSelectedSlot("");
 
-      fetchReservations();
+      if (data.reservation) {
+        setReservations(prev => [data.reservation, ...prev]);
+      } else {
+        fetchReservations();
+      }
+
       fetchAllAvailability();
+
+      // Mobile UX: Scroll to My Reservations after booking
+      setTimeout(() => {
+        const reservationsSection = document.getElementById("my-reservations-sidebar");
+        if (reservationsSection) {
+          reservationsSection.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 300); // Slight delay to ensure DOM render
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -135,15 +143,6 @@ export default function BookingForm({
         <div className="header-content">
           <h1 className="main-title">ASC 구디 라운지 예약</h1>
           <p className="sub-title">편안한 공간에서 최고의 집중을 경험하세요</p>
-          <a
-            href="https://mellow-melon-4ac.notion.site/ASC-3056400e926880e6975aeb71c204cc0b?source=copy_link"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="notion-link"
-          >
-            <ExternalLink size={14} />
-            라운지 이용 규칙 및 다른 라운지 안내
-          </a>
         </div>
 
         {user ? (
@@ -158,7 +157,7 @@ export default function BookingForm({
               </div>
             </div>
             <button
-              className="btn-logout"
+              className="btn-logout-pill"
               onClick={async () => {
                 try {
                   await fetch("/api/auth/logout", { method: "POST" });
@@ -166,7 +165,8 @@ export default function BookingForm({
                 } catch (error) { console.error("Logout failed", error); }
               }}
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
+              <span>로그아웃</span>
             </button>
           </div>
         ) : (
@@ -191,7 +191,7 @@ export default function BookingForm({
       )}
 
       <div className="booking-grid">
-        {/* Left Column: Calendar Only (Small) */}
+        {/* Left Column: Calendar & Sidebar Reservations */}
         <div className="left-side">
           <div className="step-card">
             <div className="step-header">
@@ -212,19 +212,56 @@ export default function BookingForm({
             {selectedDate && (
               <div className="selected-date-banner">
                 <CalendarIcon size={16} />
-                <span>{selectedDate}</span>
+                <span>{formatKoreanDate(selectedDate)}</span>
                 <div className={`badge ${isHoliday(selectedDate) ? "badge-holiday" : isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
                   {isHoliday(selectedDate) ? "공휴일" : isWeekend(selectedDate) ? "주말" : "평일"}
                 </div>
               </div>
             )}
           </div>
+
+          {/* My Reservations Sidebar - Moved to Left */}
+          {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
+            <div id="my-reservations-sidebar" className="my-reservations-sidebar">
+              <h2 className="sidebar-heading">나의 예약 현황</h2>
+              <div className="reservations-stack">
+                {reservations
+                  .filter((r) => r.userId === user.id)
+                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                  .map((r) => (
+                    <div key={r.id} className="mini-res-card">
+                      <div className="mini-res-content">
+                        <div className="mini-res-date">{formatKoreanDate(r.date)}</div>
+                        <div className="mini-res-time">
+                          <Clock size={12} /> {r.timeSlot}
+                        </div>
+                        <button
+                          className="btn-cancel-mini-text"
+                          onClick={async () => {
+                            if (!confirm("예약을 취소하시겠습니까?")) return;
+                            await fetch("/api/reservations", {
+                              method: "DELETE",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ id: r.id }),
+                            });
+                            fetchReservations();
+                            fetchAllAvailability();
+                          }}
+                        >
+                          예약 취소
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Column: Time & Summary */}
+        {/* Right Column: Time Selection & Confirmation */}
         <div className="right-side">
-          {/* Step 2: Time */}
-          <div className={`step-card ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
+          {/* Step 2: Time Selection */}
+          <div className={`step-card time-section-card ${!selectedDate ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="step-header">
               <div className="step-number">02</div>
               <h3>시간 선택</h3>
@@ -247,7 +284,7 @@ export default function BookingForm({
             <div className="summary-body">
               <div className="summary-item">
                 <span className="label">날짜</span>
-                <span className="value">{selectedDate || "-"}</span>
+                <span className="value">{formatKoreanDate(selectedDate) || "-"}</span>
               </div>
               <div className="summary-item">
                 <span className="label">시간</span>
@@ -273,7 +310,7 @@ export default function BookingForm({
         </div>
       </div>
 
-      {/* Notice Section Moved to Bottom */}
+      {/* Notice Section */}
       <div className="notice-section-full">
         <div className="notice-header">
           <Info size={18} style={{ color: '#d97706' }} />
@@ -287,49 +324,13 @@ export default function BookingForm({
         </ul>
       </div>
 
-      {/* My Reservations Section */}
-      {user && reservations.filter((r) => r.userId === user.id).length > 0 && (
-        <div className="my-reservations-section">
-          <h2 className="section-heading">나의 예약 현황</h2>
-          <div className="reservations-grid">
-            {reservations
-              .filter((r) => r.userId === user.id)
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // 최신순
-              .map((r) => (
-                <div key={r.id} className="reservation-card">
-                  <div className="res-status-bar"></div>
-                  <div className="res-content">
-                    <div className="res-time-badge">
-                      <Clock size={14} /> {r.timeSlot}
-                    </div>
-                    <div className="res-date-text">
-                      {r.date}
-                    </div>
-                    <button
-                      className="btn-cancel"
-                      onClick={async () => {
-                        if (!confirm("예약을 취소하시겠습니까?")) return;
-                        await fetch("/api/reservations", {
-                          method: "DELETE",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ id: r.id }),
-                        });
-                        fetchReservations();
-                        fetchAllAvailability();
-                      }}
-                    >
-                      예약 취소
-                    </button>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
-
       {showAuthModal && (
         <AuthModal
-          onSuccess={(u) => { setUser(u); setShowAuthModal(false); }}
+          onSuccess={(u) => {
+            setUser(u);
+            setShowAuthModal(false);
+            fetchReservations();
+          }}
           onClose={() => setShowAuthModal(false)}
         />
       )}
@@ -363,24 +364,6 @@ export default function BookingForm({
           color: #64748b;
           font-weight: 500;
         }
-        .notion-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          margin-top: 12px;
-          font-size: 13px;
-          color: #4f46e5;
-          font-weight: 600;
-          background: #eef2ff;
-          padding: 6px 12px;
-          border-radius: 20px;
-          text-decoration: none;
-          transition: all 0.2s;
-        }
-        .notion-link:hover {
-          background: #e0e7ff;
-          color: #4338ca;
-        }
 
         /* User Profile */
         .user-profile-card {
@@ -406,15 +389,21 @@ export default function BookingForm({
         .user-text { display: flex; flex-direction: column; }
         .user-name { font-weight: 700; font-size: 13px; color: #1e293b; }
         .user-role { font-size: 11px; color: #64748b; font-weight: 600; display: flex; align-items: center; }
-        .btn-logout { 
-          width: 32px; height: 32px; 
-          border-radius: 50%; 
-          border: 1px solid #f1f5f9; 
-          display: flex; align-items: center; justify-content: center; 
-          color: #94a3b8;
+        .btn-logout-pill {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 12px;
+          border-radius: 20px;
+          border: 1px solid #e2e8f0;
+          background: #f8fafc;
+          color: #64748b;
+          font-size: 12px;
+          font-weight: 600;
           transition: all 0.2s;
+          margin-left: 4px;
         }
-        .btn-logout:hover { background: #fef2f2; color: #ef4444; border-color: #fee2e2; }
+        .btn-logout-pill:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
         .btn-login-header {
           background: #1e293b; color: white;
           padding: 10px 20px; border-radius: 12px;
@@ -431,7 +420,7 @@ export default function BookingForm({
         /* Grid Layout */
         .booking-grid {
           display: grid;
-          grid-template-columns: 400px 1fr; /* Fixed Width Calendar (Left), Flexible Right */
+          grid-template-columns: 400px 1fr;
           gap: 32px;
           align-items: start;
         }
@@ -439,15 +428,8 @@ export default function BookingForm({
           .booking-grid { grid-template-columns: 1fr; }
         }
 
-        /* Left Side (Calendar) */
-        .left-side {
-          display: flex; flex-direction: column;
-        }
-
-        /* Right Side (Time & Summary) */
-        .right-side {
-          display: flex; flex-direction: column; gap: 24px;
-        }
+        .left-side { display: flex; flex-direction: column; }
+        .right-side { display: flex; flex-direction: column; gap: 24px; }
 
         /* Steps & Cards */
         .step-card {
@@ -456,6 +438,9 @@ export default function BookingForm({
           padding: 28px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.02);
           border: 1px solid #f8fafc;
+          min-height: 560px; /* Enforce consistent height */
+          display: flex;
+          flex-direction: column;
         }
         .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .step-number {
@@ -477,7 +462,50 @@ export default function BookingForm({
           color: #1e293b; font-weight: 600; font-size: 14px;
         }
 
-        /* Summary Card (Main) */
+        /* Time Selection Height Alignment */
+        .time-section-card {
+           display: flex;
+           flex-direction: column;
+           /* height: 520px; Removed in favor of min-height on step-card */
+           flex: 1; 
+        }
+        .time-selector-wrapper { min-height: 0; }
+        
+        @media (max-width: 900px) {
+          .time-section-card { min-height: 400px; }
+          .step-card { min-height: auto; } /* Reset min-height on mobile */
+        }
+
+        /* Sidebar Reservations */
+        .my-reservations-sidebar { margin-top: 24px; }
+        .sidebar-heading {
+          font-size: 16px;
+          font-weight: 700;
+          color: #1e293b;
+          margin-bottom: 12px;
+          padding-left: 4px;
+        }
+        .reservations-stack { display: flex; flex-direction: column; gap: 12px; }
+        .mini-res-card {
+          background: white;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+          padding: 16px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .mini-res-date { font-weight: 700; font-size: 14px; color: #1e293b; margin-bottom: 6px; }
+        .mini-res-time {
+          font-size: 11px; color: #64748b; font-weight: 600;
+          display: flex; align-items: center; gap: 4px; margin-bottom: 12px;
+        }
+        .btn-cancel-mini-text {
+          font-size: 12px; color: #ef4444; font-weight: 600;
+          background: #fff1f2; border: none; padding: 6px 12px;
+          border-radius: 8px; width: 100%; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-cancel-mini-text:hover { background: #fee2e2; }
+
+        /* Summary Card */
         .summary-card-main {
           background: white;
           border-radius: 24px;
@@ -486,61 +514,37 @@ export default function BookingForm({
           border: 1px solid #f8fafc;
         }
         .summary-header h3 { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 20px; }
-        
         .summary-body {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 24px;
-          background: #f8fafc;
-          padding: 20px;
-          border-radius: 16px;
-          gap: 16px;
+          display: flex; justify-content: space-between;
+          margin-bottom: 24px; background: #f8fafc;
+          padding: 20px; border-radius: 16px; gap: 16px;
         }
-        @media (max-width: 600px) {
-           .summary-body { flex-direction: column; }
-        }
-
-        .summary-item {
-          display: flex; flex-direction: column; gap: 6px;
-        }
+        @media (max-width: 600px) { .summary-body { flex-direction: column; } }
+        .summary-item { display: flex; flex-direction: column; gap: 6px; }
         .label { color: #64748b; font-size: 12px; font-weight: 500; }
         .value { color: #1e293b; font-size: 15px; font-weight: 700; }
 
         .btn-confirm-booking {
-          width: 100%;
-          padding: 16px;
-          background: #4f46e5;
-          color: white;
-          border-radius: 14px;
-          font-size: 15px; font-weight: 700;
-          transition: all 0.2s;
-          box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+          width: 100%; padding: 16px;
+          background: #4f46e5; color: white;
+          border-radius: 14px; font-size: 15px; font-weight: 700;
+          transition: all 0.2s; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
         .btn-confirm-booking:hover:not(:disabled) {
           background: #4338ca; transform: translateY(-2px);
           box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
         }
-        .btn-confirm-booking:disabled {
-          background: #cbd5e1; box-shadow: none; cursor: not-allowed;
-        }
+        .btn-confirm-booking:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
         .login-hint { text-align: center; color: #ef4444; font-size: 12px; margin-top: 10px; font-weight: 600; }
 
-        /* Notice Section (Full Width Bottom) */
+        /* Notice Section */
         .notice-section-full {
-          margin-top: 40px;
-          background: #fffbeb;
-          border: 1px solid #fef3c7;
-          border-radius: 16px;
-          padding: 24px;
+          margin-top: 40px; background: #fffbeb;
+          border: 1px solid #fef3c7; border-radius: 16px; padding: 24px;
         }
         .notice-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-weight: 700;
-          color: #b45309;
-          margin-bottom: 16px;
-          font-size: 15px;
+          display: flex; align-items: center; gap: 8px;
+          font-weight: 700; color: #b45309; margin-bottom: 16px; font-size: 15px;
         }
         .notice-list-horizontal {
           padding-left: 0; margin: 0; list-style: none;
@@ -549,40 +553,6 @@ export default function BookingForm({
         .notice-list-horizontal li {
           font-size: 13px; color: #92400e; display: flex; align-items: center; gap: 6px;
         }
-
-        /* Chrome/Edge bug fix for columns */
-        .time-selector-wrapper { min-height: 0; }
-
-        /* My Reservations */
-        .my-reservations-section { margin-top: 60px; border-top: 1px solid #f1f5f9; padding-top: 40px; }
-        .section-heading { font-size: 22px; font-weight: 800; margin-bottom: 24px; color: #1e293b; }
-        .reservations-grid {
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
-        }
-        .reservation-card {
-          background: white; border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-          border: 1px solid #f1f5f9;
-          transition: transform 0.2s;
-        }
-        .reservation-card:hover { transform: translateY(-2px); }
-        .res-status-bar { height: 6px; background: #10b981; }
-        .res-content { padding: 20px; }
-        .res-time-badge {
-          display: inline-flex; align-items: center; gap: 6px;
-          background: #f0fdf4; color: #15803d;
-          padding: 6px 12px; border-radius: 20px;
-          font-size: 12px; font-weight: 700; margin-bottom: 12px;
-        }
-        .res-date-text { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
-        .btn-cancel {
-          width: 100%; padding: 10px;
-          border: 1px solid #fee2e2; background: white;
-          color: #ef4444; font-weight: 600; border-radius: 10px;
-          font-size: 13px; transition: all 0.2s;
-        }
-        .btn-cancel:hover { background: #fee2e2; }
 
         .badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; margin-left: auto; }
         .badge-holiday { background: #fef2f2; color: #dc2626; }

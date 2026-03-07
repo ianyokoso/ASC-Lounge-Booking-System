@@ -19,6 +19,8 @@
 
 # production
 /build
+*.zip
+lounge_dist.zip
 
 # misc
 .DS_Store

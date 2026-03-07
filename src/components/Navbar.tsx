@@ -38,28 +38,31 @@ export default function Navbar() {
             top: 0,
             zIndex: 1000
         }}>
-            <div
-                role="img"
-                aria-label="ASC Logo"
-                style={{
-                    width: '60px',
-                    height: '60px',
-                    flexShrink: 0,
-                    marginRight: '20px',
-                    backgroundImage: 'url(https://i.imgur.com/kA9tM7m.png)',
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                }}
-            />
+            <Link href="/" style={{ marginRight: '20px' }}>
+                <div
+                    role="img"
+                    aria-label="ASC Logo"
+                    style={{
+                        width: '60px',
+                        height: '60px',
+                        flexShrink: 0,
+                        backgroundImage: 'url(https://i.imgur.com/kA9tM7m.png)',
+                        backgroundSize: 'contain',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        cursor: 'pointer',
+                        borderRadius: '12px'
+                    }}
+                />
+            </Link>
             <div style={{
-                display: 'flex',
-                gap: '24px',
-                alignItems: 'center',
                 height: '100%',
-                flexShrink: 0
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
             }}>
-                <Link href="/" style={{
+                <Link href="/guro" style={{
                     textDecoration: 'none',
                     color: '#334155',
                     fontSize: '15px',
@@ -70,7 +73,7 @@ export default function Navbar() {
                     border: '1px solid transparent',
                     lineHeight: '1'
                 }}>예약하기</Link>
-                <Link href="/status" style={{
+                <Link href="/guro/status" style={{
                     textDecoration: 'none',
                     color: '#3b82f6',
                     fontSize: '15px',
@@ -85,8 +88,8 @@ export default function Navbar() {
                     border: '1px solid #dbeafe',
                     lineHeight: '1',
                     boxShadow: '0 2px 4px rgba(59, 130, 246, 0.05)'
-                }}>전체예약현황보기</Link>
+                }}>전체 예약 현황 보기</Link>
             </div>
-        </nav>
+        </nav >
     );
 }

@@ -277,16 +277,15 @@ export default function AdminDashboard({ initialReservations, isAdmin = false }:
                                         </div>
                                     </div>
                                     <div className="recent-status">
-                                        {isAdmin ? (
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <span className="status-badge">예약 확정</span>
                                             <button
                                                 onClick={() => handleCancel(r.id)}
-                                                className="btn-cancel"
+                                                className="btn-cancel-mini"
                                             >
                                                 취소
                                             </button>
-                                        ) : (
-                                            <span className="status-badge">예약 확정</span>
-                                        )}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -638,6 +637,22 @@ export default function AdminDashboard({ initialReservations, isAdmin = false }:
                 }
                 .btn-cancel:hover {
                     background: #fecaca;
+                }
+                .btn-cancel-mini {
+                    background: #fff1f2;
+                    color: #e11d48;
+                    border: 1px solid #ffe4e6;
+                    padding: 4px 10px;
+                    border-radius: 6px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .btn-cancel-mini:hover {
+                    background: #ffe4e6;
+                    border-color: #fecaca;
+                    transform: translateY(-1px);
                 }
             `}</style>
         </main>

@@ -46,3 +46,14 @@ export function getSlotsForDate(dateStr: string): string[] {
     if (!dateStr) return [];
     return isWeekendOrHoliday(dateStr) ? WEEKEND_SLOTS : WEEKDAY_SLOTS;
 }
+export function formatKoreanDate(dateStr: string): string {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekDays = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+    const weekDay = weekDays[date.getDay()];
+
+    return `${year}년 ${month}월 ${day}일 (${weekDay})`;
+}

@@ -1,72 +1,199 @@
-import { prisma } from "@/lib/prisma";
-import BookingForm from "@/components/BookingForm";
-import { cookies } from "next/headers";
-import { Info } from "lucide-react";
+"use client";
 
-async function getInitialData() {
-  const cookieStore = await cookies();
-  const userId = cookieStore.get("userId")?.value;
+import Link from "next/link";
+import { MapPin, ArrowRight } from "lucide-react";
 
-  // 1. 유저 정보 조회
-  let user = null;
-  if (userId) {
-    user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, username: true, name: true, discordId: true },
-    });
-  }
-
-  // 2. 미래의 모든 예약 조회 (가용성 맵 생성)
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-  const allReservations = await prisma.reservation.findMany({
-    where: {
-      date: {
-        gte: todayStr,
-      },
-    },
-    select: {
-      date: true,
-      timeSlot: true,
-    },
-  });
-
-  const availabilityMap: Record<string, string[]> = {};
-  allReservations.forEach((r) => {
-    if (!availabilityMap[r.date]) {
-      availabilityMap[r.date] = [];
-    }
-    availabilityMap[r.date].push(r.timeSlot);
-  });
-
-  // 3. 내 예약 목록 조회 (로그인 시)
-  let myReservations: any[] = [];
-  if (userId) {
-    myReservations = await prisma.reservation.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-    });
-  }
-
-  return {
-    user,
-    availabilityMap,
-    myReservations,
+export default function Home() {
+  const customButtonStyle = {
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    maxWidth: "320px",
+    height: "180px",
+    padding: "24px",
+    borderRadius: "24px",
+    background: "white",
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    textDecoration: "none",
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    border: "1px solid #f1f5f9",
   };
-}
 
-export default async function Home() {
-  const { user, availabilityMap, myReservations } = await getInitialData();
+  const locations = [
+    {
+      name: "구디 라운지",
+      desc: "ASC Guro Lounge",
+      href: "/guro",
+      isExternal: false,
+      color: "#4f46e5",
+      bgColor: "#eef2ff",
+    },
+    {
+      name: "안국 라운지",
+      desc: "Ankuk Station",
+      href: "https://m.booking.naver.com/booking/6/bizes/715955/items/7031202?area=pll&lang=ko&startDate=2025-09-01&theme=place",
+      isExternal: true,
+      color: "#059669",
+      bgColor: "#ecfdf5",
+    },
+
+  ];
 
   return (
-    <main style={{ minHeight: "100vh", backgroundColor: "#f8fafc", paddingBottom: "80px" }}>
-      <BookingForm
-        initialAvailability={availabilityMap}
-        initialUser={user}
-        initialReservations={myReservations}
-      />
-    </main>
+    <main style={{
+      minHeight: "100vh",
+      backgroundColor: "#f8fafc",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "20px"
+    }}>
+      <div style={{ marginBottom: "60px", textAlign: "center" }}>
+        <div
+          role="img"
+          aria-label="ASC Logo"
+          style={{
+            width: "100px",
+            height: "100px",
+            margin: "0 auto 24px",
+            backgroundImage: "url(https://i.imgur.com/kA9tM7m.png)",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            borderRadius: "16px"
+          }}
+        />
+        <h1 style={{
+          fontSize: "28px",
+          fontWeight: "800",
+          color: "#0f172a",
+          marginBottom: "12px"
+        }}>
+          ASC 라운지 예약
+        </h1>
+        <p style={{ color: "#64748b", fontSize: "16px" }}>이용하실 라운지를 선택해주세요</p>
+      </div>
+
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        width: "100%",
+        alignItems: "center"
+      }}>
+        {locations.map((loc) => (
+          <Link
+            key={loc.name}
+            href={loc.href}
+            target={loc.isExternal ? "_blank" : undefined}
+            rel={loc.isExternal ? "noopener noreferrer" : undefined}
+            style={customButtonStyle}
+            className="location-card"
+          >
+            <div style={{
+              width: "56px",
+              height: "56px",
+              borderRadius: "50%",
+              background: loc.bgColor,
+              color: loc.color,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: "16px"
+            }}>
+              <MapPin size={28} />
+            </div>
+            <span style={{
+              fontSize: "18px",
+              fontWeight: "700",
+              color: "#1e293b",
+              marginBottom: "4px"
+            }}>
+              {loc.name}
+            </span>
+            <span style={{
+              fontSize: "13px",
+              color: "#94a3b8",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
+            }}>
+              {loc.desc} {loc.isExternal && <ArrowRight size={12} />}
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      <a
+        href="https://mellow-melon-4ac.notion.site/ASC-3056400e926880e6975aeb71c204cc0b?source=copy_link"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="notion-link-button"
+      >
+        <span style={{ marginRight: '8px' }}>🔗</span>
+        라운지 이용 규칙 안내
+      </a>
+
+      <style jsx global>{`
+        .notion-link-button {
+          margin-top: 40px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 14px 28px;
+          background: #fffbeb;
+          border: 2px solid #fde68a;
+          border-radius: 16px;
+          color: #92400e;
+          font-weight: 700;
+          text-decoration: none;
+          transition: all 0.2s;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          font-size: 15px;
+        }
+        .notion-link-button:hover {
+          background: #fef3c7;
+          border-color: #fcd34d;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .location-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+          border-color: #cbd5e1 !important;
+        }
+        
+        .notice-section-full {
+          margin-top: 40px;
+          background: #fffbeb;
+          border: 1px solid #fef3c7;
+          border-radius: 16px;
+          padding: 24px;
+          width: 100%;
+          max-width: 600px;
+        }
+        .notice-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 700;
+          color: #b45309;
+          margin-bottom: 16px;
+          font-size: 15px;
+        }
+        .notice-list-horizontal {
+          padding-left: 0; margin: 0; list-style: none;
+          display: flex; flex-direction: column; gap: 10px;
+        }
+        .notice-list-horizontal li {
+          font-size: 14px; color: #92400e; display: flex; align-items: center; gap: 6px;
+        }
+      `}</style>
+    </main >
   );
 }
-
