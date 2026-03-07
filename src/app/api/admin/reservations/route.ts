@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 // GET: 모든 예약 목록 조회 (관리자용)
 export async function GET(req: Request) {
@@ -45,6 +46,9 @@ export async function DELETE(req: Request) {
         await prisma.reservation.delete({
             where: { id },
         });
+
+        // @ts-ignore
+        revalidateTag("reservations");
 
         return NextResponse.json({ message: "삭제되었습니다" });
     } catch (error: any) {

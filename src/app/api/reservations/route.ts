@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
+import { revalidateTag } from "next/cache";
 
 // GET: 예약 조회
 export async function GET(req: Request) {
@@ -106,6 +107,9 @@ export async function POST(req: Request) {
             },
         });
 
+        // @ts-ignore
+        revalidateTag("reservations");
+
         return NextResponse.json(
             { message: "예약 성공", reservation: newReservation },
             { status: 201 }
@@ -164,6 +168,9 @@ export async function DELETE(req: Request) {
         await prisma.reservation.delete({
             where: { id: reservationId },
         });
+
+        // @ts-ignore
+        revalidateTag("reservations");
 
         return NextResponse.json({ message: "예약이 취소되었습니다" });
     } catch (error: any) {

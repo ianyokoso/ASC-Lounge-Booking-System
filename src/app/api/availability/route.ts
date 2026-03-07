@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // GET: 예약된 시간대 목록 조회 (단일 날짜 또는 전체 범위)
 export async function GET(req: Request) {
     try {
