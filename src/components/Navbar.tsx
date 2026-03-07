@@ -21,7 +21,7 @@ export default function Navbar() {
     // Better: just render. usePathname works on client side.
 
     // Hide navbar on admin pages
-    if (pathname?.startsWith("/admin")) {
+    if (pathname?.includes("/admin")) {
         return null;
     }
 
