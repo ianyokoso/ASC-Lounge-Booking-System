@@ -29,8 +29,12 @@ export async function PATCH(request: Request) {
 
         // Notify User via SMS
         if (reservation.phoneNumber) {
-            const statusText = status === "CONFIRMED" ? "승인" : "불가(거절)";
-            const text = `[ASC 강남 라운지 안내]\n${reservation.name}님의 예약이 ${statusText} 처리되었습니다.\n예약 일시: ${reservation.date} ${reservation.timeSlot}`;
+            let text: string;
+            if (status === "CONFIRMED") {
+                text = `[ASC 강남 라운지 안내]\n${reservation.name}님의 예약이 승인 처리되었습니다.\n예약 일시: ${reservation.date} ${reservation.timeSlot}\n\n자세한 문의 사항은 커뮤니티 매니저에게 연락 바랍니다.`;
+            } else {
+                text = `[ASC 강남 라운지 안내]\n${reservation.name}님의 예약이 불가(거절) 처리되었습니다.\n예약 일시: ${reservation.date} ${reservation.timeSlot}\n\n자세한 사항은 커뮤니티 매니저에게 연락 바랍니다.`;
+            }
 
             await sendSms(reservation.phoneNumber, text).catch(e => console.error("User SMS Error:", e));
         }
@@ -60,7 +64,7 @@ export async function DELETE(request: Request) {
 
         // 예약자에게 취소 SMS 알림
         if (reservation.phoneNumber) {
-            const text = `[ASC 강남 라운지 안내]\n${reservation.name}님의 ${reservation.date} ${reservation.timeSlot} 예약이 관리자에 의해 취소되었습니다.`;
+            const text = `[ASC 강남 라운지 안내]\n${reservation.name}님의 ${reservation.date} ${reservation.timeSlot} 예약이 취소되었습니다.\n\n자세한 문의 사항은 커뮤니티 매니저에게 연락 바랍니다.`;
             await sendSms(reservation.phoneNumber, text).catch(e => console.error("Admin Cancel SMS Error:", e));
         }
 

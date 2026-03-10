@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         // Notify Manager via SMS
         const managerConfig = await prisma.siteConfig.findUnique({ where: { key: "GANGNAM_MANAGER_PHONE" } });
         if (managerConfig?.value) {
-            const text = `[강남 라운지 예약 요청]\n이름: ${name}\n날짜: ${date}\n시간: ${timeSlot}\n디스코드: ${discordNickname}\n연락처: ${phoneNumber}\n\n관리자 대시보드에서 승인해주세요.`;
+            const text = `[비타임 미팅룸(7인실) 예약 요청]\n이름: ${name}\n날짜: ${date}\n시간: ${timeSlot}\n연락처: ${phoneNumber}\n\n아래 페이지에서 승인 여부 확인 바랍니다.\nhttps://asc-lounge-booking-system.vercel.app/gangnam/admin`;
             await sendSms(managerConfig.value, text).catch(e => console.error("Manager SMS Error:", e));
         } else {
             console.warn("GANGNAM_MANAGER_PHONE not set in SiteConfig.");
@@ -121,10 +121,11 @@ export async function DELETE(request: Request) {
             where: { id },
         });
 
-        // 예약자에게 취소 SMS 알림
-        if (reservation.phoneNumber) {
-            const text = `[ASC 강남 라운지 예약 취소]\n예약 일시: ${reservation.date} ${reservation.timeSlot}\n예약이 취소되었습니다.`;
-            await sendSms(reservation.phoneNumber, text).catch(e => console.error("Gangnam Cancel SMS Error:", e));
+        // 매니저에게 취소 SMS 알림
+        const managerConfig = await prisma.siteConfig.findUnique({ where: { key: "GANGNAM_MANAGER_PHONE" } });
+        if (managerConfig?.value) {
+            const text = `[비타임 미팅룸(7인실) 예약 취소]\n이름: ${reservation.name}\n날짜: ${reservation.date}\n시간: ${reservation.timeSlot}\n연락처: ${reservation.phoneNumber}`;
+            await sendSms(managerConfig.value, text).catch(e => console.error("Manager Cancel SMS Error:", e));
         }
 
         return NextResponse.json({ message: "예약이 취소되었습니다." });
