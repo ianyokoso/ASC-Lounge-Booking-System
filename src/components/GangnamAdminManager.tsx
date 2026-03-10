@@ -139,34 +139,6 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                 <h1>강남 예약 관리</h1>
             </header>
 
-            <section className="settings-section">
-                <div className="settings-header">
-                    <Settings size={18} />
-                    <h2>매니저 설정</h2>
-                </div>
-                <div className="settings-row">
-                    <label>강남 라운지 매니저 번호</label>
-                    <div className="phone-input-group">
-                        <input
-                            type="tel"
-                            value={managerPhone}
-                            onChange={(e) => setManagerPhone(e.target.value)}
-                            placeholder="01012345678"
-                            className="phone-input"
-                        />
-                        <button
-                            onClick={handleSaveManagerPhone}
-                            disabled={savingPhone || managerPhone === savedManagerPhone}
-                            className="btn-save"
-                        >
-                            <Save size={14} />
-                            {savingPhone ? "저장 중..." : "저장"}
-                        </button>
-                    </div>
-                    <p className="settings-desc">예약 생성 시 이 번호로 SMS 알림이 전송됩니다.</p>
-                </div>
-            </section>
-
             {pendingCount > 0 && (
                 <div className="pending-alert">
                     <span>승인 대기 중인 예약이 {pendingCount}건 있습니다</span>
@@ -281,6 +253,34 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                 )}
             </section>
 
+            <section className="settings-section">
+                <div className="settings-header">
+                    <Settings size={18} />
+                    <h2>매니저 설정</h2>
+                </div>
+                <div className="settings-row">
+                    <label>강남 라운지 매니저 번호</label>
+                    <div className="phone-input-group">
+                        <input
+                            type="tel"
+                            value={managerPhone}
+                            onChange={(e) => setManagerPhone(e.target.value)}
+                            placeholder="01012345678"
+                            className="phone-input"
+                        />
+                        <button
+                            onClick={handleSaveManagerPhone}
+                            disabled={savingPhone || managerPhone === savedManagerPhone}
+                            className="btn-save"
+                        >
+                            <Save size={14} />
+                            {savingPhone ? "저장 중..." : "저장"}
+                        </button>
+                    </div>
+                    <p className="settings-desc">예약 생성 시 이 번호로 SMS 알림이 전송됩니다.</p>
+                </div>
+            </section>
+
             <style jsx>{`
                 .manager-container {
                     max-width: 900px;
@@ -316,7 +316,7 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
                     border: 1px solid #e2e8f0;
                     padding: 24px;
-                    margin-bottom: 24px;
+                    margin-top: 24px;
                 }
                 .settings-header {
                     display: flex;
