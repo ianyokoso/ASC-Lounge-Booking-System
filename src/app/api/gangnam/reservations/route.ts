@@ -117,8 +117,9 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: "예약을 취소할 권한이 없습니다." }, { status: 403 });
         }
 
-        await prisma.gangnamReservation.delete({
+        await prisma.gangnamReservation.update({
             where: { id },
+            data: { status: "CANCELLED", cancelledBy: "USER" },
         });
 
         // 매니저에게 취소 SMS 알림

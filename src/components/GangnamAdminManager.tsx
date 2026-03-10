@@ -60,7 +60,7 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
     };
 
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`${name}님의 예약을 취소(삭제)하시겠습니까? 예약자에게 취소 문자가 발송됩니다.`)) return;
+        if (!confirm(`${name}님의 예약을 취소하시겠습니까? 예약자에게 취소 문자가 발송됩니다.`)) return;
 
         try {
             const res = await fetch(`/api/admin/gangnam`, {
@@ -71,7 +71,7 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
 
             if (res.ok) {
                 alert("예약이 취소되었습니다.");
-                setReservations(prev => prev.filter(r => r.id !== id));
+                setReservations(prev => prev.map(r => r.id === id ? { ...r, status: "CANCELLED", cancelledBy: "ADMIN" } : r));
             } else {
                 const data = await res.json();
                 alert(data.error || "취소 실패");
@@ -122,6 +122,8 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                 return <span className="badge badge-confirmed">승인됨</span>;
             case "REJECTED":
                 return <span className="badge badge-rejected">거절됨</span>;
+            case "CANCELLED":
+                return <span className="badge badge-cancelled">취소됨</span>;
             default:
                 return <span className="badge">{status}</span>;
         }
@@ -211,7 +213,7 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                                         {getStatusBadge(r.status)}
                                     </div>
                                 </div>
-                                {r.status !== "REJECTED" && (
+                                {r.status !== "REJECTED" && r.status !== "CANCELLED" && (
                                     <div className="res-action">
                                         {r.status === "PENDING" && (
                                             <>
@@ -514,6 +516,10 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                 .badge-rejected {
                     background: #fee2e2;
                     color: #dc2626;
+                }
+                .badge-cancelled {
+                    background: #f1f5f9;
+                    color: #64748b;
                 }
 
                 .res-action {

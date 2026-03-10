@@ -60,7 +60,10 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
         }
 
-        await prisma.gangnamReservation.delete({ where: { id } });
+        await prisma.gangnamReservation.update({
+            where: { id },
+            data: { status: "CANCELLED", cancelledBy: "ADMIN" },
+        });
 
         // 예약자에게 취소 SMS 알림
         if (reservation.phoneNumber) {

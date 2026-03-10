@@ -55,12 +55,14 @@ export default function GangnamStatusPage() {
         const confirmed = monthlyReservations.filter(r => r.status === "CONFIRMED");
         const rejected = monthlyReservations.filter(r => r.status === "REJECTED");
         const pending = monthlyReservations.filter(r => r.status === "PENDING");
+        const cancelled = monthlyReservations.filter(r => r.status === "CANCELLED");
         const totalHours = confirmed.reduce((sum, r) => sum + getHoursFromSlot(r.timeSlot), 0);
         return {
             total: monthlyReservations.length,
             confirmed: confirmed.length,
             rejected: rejected.length,
             pending: pending.length,
+            cancelled: cancelled.length,
             totalHours,
         };
     }, [monthlyReservations]);
@@ -92,7 +94,7 @@ export default function GangnamStatusPage() {
                 이름: r.name,
                 연락처: r.phoneNumber,
                 디스코드: r.discordNickname,
-                상태: r.status === "CONFIRMED" ? "승인" : r.status === "REJECTED" ? "거절" : "대기",
+                상태: r.status === "CONFIRMED" ? "승인" : r.status === "REJECTED" ? "거절" : r.status === "CANCELLED" ? (r.cancelledBy === "ADMIN" ? "매니저 취소" : "본인 취소") : "대기",
                 이용시간: r.status === "CONFIRMED" ? `${getHoursFromSlot(r.timeSlot)}시간` : "-",
             }));
 
@@ -129,7 +131,7 @@ export default function GangnamStatusPage() {
         return r.status === filter;
     });
 
-    const getStatusBadge = (status: string) => {
+    const getStatusBadge = (status: string, cancelledBy?: string) => {
         switch (status) {
             case "PENDING":
                 return <span className="badge badge-pending">대기중</span>;
@@ -137,6 +139,8 @@ export default function GangnamStatusPage() {
                 return <span className="badge badge-confirmed">승인됨</span>;
             case "REJECTED":
                 return <span className="badge badge-rejected">거절됨</span>;
+            case "CANCELLED":
+                return <span className="badge badge-cancelled">{cancelledBy === "ADMIN" ? "매니저 취소" : "본인 취소"}</span>;
             default:
                 return <span className="badge">{status}</span>;
         }
@@ -145,6 +149,7 @@ export default function GangnamStatusPage() {
     const pendingCount = reservations.filter(r => r.status === "PENDING").length;
     const confirmedCount = reservations.filter(r => r.status === "CONFIRMED").length;
     const rejectedCount = reservations.filter(r => r.status === "REJECTED").length;
+    const cancelledCount = reservations.filter(r => r.status === "CANCELLED").length;
 
     return (
         <main className="status-container">
@@ -247,7 +252,7 @@ export default function GangnamStatusPage() {
                                                 </div>
                                             </div>
                                             <div className="res-status">
-                                                {getStatusBadge(r.status)}
+                                                {getStatusBadge(r.status, r.cancelledBy)}
                                             </div>
                                         </div>
                                     </div>
@@ -330,7 +335,7 @@ export default function GangnamStatusPage() {
                                                 <td>{r.timeSlot}</td>
                                                 <td>{r.name}</td>
                                                 <td>{r.phoneNumber}</td>
-                                                <td>{getStatusBadge(r.status)}</td>
+                                                <td>{getStatusBadge(r.status, r.cancelledBy)}</td>
                                                 <td>{r.status === "CONFIRMED" ? `${getHoursFromSlot(r.timeSlot)}시간` : "-"}</td>
                                             </tr>
                                         ))}
@@ -608,6 +613,7 @@ export default function GangnamStatusPage() {
                 .badge-pending { background: #fef3c7; color: #92400e; }
                 .badge-confirmed { background: #dcfce7; color: #166534; }
                 .badge-rejected { background: #fee2e2; color: #dc2626; }
+                .badge-cancelled { background: #f1f5f9; color: #64748b; }
 
                 .table-wrap {
                     overflow-x: auto;
