@@ -239,33 +239,37 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                                         {getStatusBadge(r.status)}
                                     </div>
                                 </div>
-                                <div className="res-action">
-                                    {r.status === "PENDING" && (
-                                        <>
+                                {r.status !== "REJECTED" && (
+                                    <div className="res-action">
+                                        {r.status === "PENDING" && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleStatusChange(r.id, "CONFIRMED")}
+                                                    className="btn-approve"
+                                                >
+                                                    <CheckCircle2 size={16} />
+                                                    승인
+                                                </button>
+                                                <button
+                                                    onClick={() => handleStatusChange(r.id, "REJECTED")}
+                                                    className="btn-reject"
+                                                >
+                                                    <XCircle size={16} />
+                                                    거절
+                                                </button>
+                                            </>
+                                        )}
+                                        {r.status === "CONFIRMED" && (
                                             <button
-                                                onClick={() => handleStatusChange(r.id, "CONFIRMED")}
-                                                className="btn-approve"
-                                            >
-                                                <CheckCircle2 size={16} />
-                                                승인
-                                            </button>
-                                            <button
-                                                onClick={() => handleStatusChange(r.id, "REJECTED")}
-                                                className="btn-reject"
+                                                onClick={() => handleDelete(r.id, r.name)}
+                                                className="btn-cancel"
                                             >
                                                 <XCircle size={16} />
-                                                거절
+                                                취소
                                             </button>
-                                        </>
-                                    )}
-                                    <button
-                                        onClick={() => handleDelete(r.id, r.name)}
-                                        className="btn-cancel"
-                                    >
-                                        <XCircle size={16} />
-                                        취소
-                                    </button>
-                                </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
