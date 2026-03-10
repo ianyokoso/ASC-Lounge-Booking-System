@@ -12,14 +12,16 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  username     String        @unique
-  password     String
-  name         String?
-  discordId    String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  reservations Reservation[]
+  id                    String                @id @default(uuid())
+  username              String                @unique
+  password              String
+  name                  String?
+  discordId             String?
+  phoneNumber           String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  reservations          Reservation[]
+  gangnamReservations   GangnamReservation[]
 }
 
 model Reservation {
@@ -31,6 +33,22 @@ model Reservation {
   status    String   @default("CONFIRMED")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([date, timeSlot])
+}
+
+model GangnamReservation {
+  id              String   @id @default(uuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  date            String
+  timeSlot        String
+  name            String
+  discordNickname String
+  phoneNumber     String
+  status          String   @default("PENDING")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@unique([date, timeSlot])
 }

@@ -51,6 +51,8 @@ export async function POST(req: Request) {
                 id: user.id,
                 username: user.username,
                 name: user.name,
+                discordId: user.discordId,
+                phoneNumber: user.phoneNumber,
             },
         });
     } catch (error: any) {

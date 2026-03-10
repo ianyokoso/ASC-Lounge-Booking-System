@@ -43,7 +43,7 @@ async function getInitialData() {
   const userPromise = userId
     ? prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, username: true, name: true, discordId: true },
+      select: { id: true, username: true, name: true, discordId: true, phoneNumber: true },
     })
     : Promise.resolve(null);
 

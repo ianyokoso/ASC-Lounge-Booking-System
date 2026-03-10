@@ -4,11 +4,18 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
     try {
-        const { username, password, name } = await req.json();
+        const { username, password, name, discordId, phoneNumber } = await req.json();
 
         if (!username || !password) {
             return NextResponse.json(
                 { error: "사용자명과 비밀번호는 필수입니다" },
+                { status: 400 }
+            );
+        }
+
+        if (!discordId || !phoneNumber) {
+            return NextResponse.json(
+                { error: "디스코드 닉네임과 전화번호는 필수입니다" },
                 { status: 400 }
             );
         }
@@ -34,6 +41,8 @@ export async function POST(req: Request) {
                 username,
                 password: hashedPassword,
                 name,
+                discordId,
+                phoneNumber,
             },
         });
 

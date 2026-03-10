@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Lock, Loader2, X } from "lucide-react";
+import { User, Lock, Loader2, X, MessageCircle, Phone } from "lucide-react";
 
 interface AuthModalProps {
     onSuccess: (user: any) => void;
@@ -13,6 +13,8 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
+    const [discordId, setDiscordId] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -22,7 +24,9 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
         setError("");
 
         const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
-        const body = isLogin ? { username, password } : { username, password, name };
+        const body = isLogin
+            ? { username, password }
+            : { username, password, name, discordId, phoneNumber };
 
         try {
             const res = await fetch(endpoint, {
@@ -117,16 +121,40 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
                     </div>
 
                     {!isLogin && (
-                        <div className="form-group">
-                            <label>이름</label>
-                            <input
-                                type="text"
-                                placeholder="본인의 이름을 입력하세요"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                            />
-                        </div>
+                        <>
+                            <div className="form-group">
+                                <label>이름</label>
+                                <input
+                                    type="text"
+                                    placeholder="본인의 이름을 입력하세요"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label><MessageCircle size={14} style={{ marginRight: 4 }} /> 디스코드 닉네임</label>
+                                <input
+                                    type="text"
+                                    placeholder="nickname#1234"
+                                    value={discordId}
+                                    onChange={(e) => setDiscordId(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label><Phone size={14} style={{ marginRight: 4 }} /> 전화번호</label>
+                                <input
+                                    type="tel"
+                                    placeholder="01012345678"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ""))}
+                                    required
+                                />
+                            </div>
+                        </>
                     )}
 
                     {error && <div className="alert alert-error">{error}</div>}
@@ -137,7 +165,7 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
                 </form>
 
                 <div className="auth-footer">
-                    <button className="btn-text" onClick={() => setIsLogin(!isLogin)}>
+                    <button className="btn-text" onClick={() => { setIsLogin(!isLogin); setError(""); }}>
                         {isLogin ? "처음 오셨나요? 정보 등록하기" : "이미 등록하셨나요? 로그인하기"}
                     </button>
                 </div>
@@ -166,6 +194,8 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
                 .auth-container {
                     width: 100%;
                     max-width: 440px;
+                    max-height: 90vh;
+                    overflow-y: auto;
                     position: relative;
                     background: white;
                     padding: 40px;
@@ -197,39 +227,41 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
                     background: #f1f5f9;
                     color: #0f172a;
                 }
-                .w-full { 
-                    width: 100%; 
+                .w-full {
+                    width: 100%;
                     margin-top: 10px;
                 }
-                .auth-header { 
-                    margin-bottom: 32px; 
-                    text-align: center; 
+                .auth-header {
+                    margin-bottom: 32px;
+                    text-align: center;
                 }
-                .auth-header h3 { 
-                    font-size: 24px; 
-                    font-weight: 800; 
-                    margin-bottom: 8px; 
+                .auth-header h3 {
+                    font-size: 24px;
+                    font-weight: 800;
+                    margin-bottom: 8px;
                     color: #0f172a;
                     letter-spacing: -0.025em;
                 }
-                .auth-header p { 
-                    font-size: 15px; 
-                    color: #64748b; 
+                .auth-header p {
+                    font-size: 15px;
+                    color: #64748b;
                 }
-                .auth-footer { 
-                    margin-top: 24px; 
-                    text-align: center; 
+                .auth-footer {
+                    margin-top: 24px;
+                    text-align: center;
                 }
-                .btn-text { 
-                    background: none; 
-                    color: #4f46e5; 
-                    font-size: 14px; 
-                    font-weight: 600; 
+                .btn-text {
+                    background: none;
+                    color: #4f46e5;
+                    font-size: 14px;
+                    font-weight: 600;
                     padding: 8px;
+                    border: none;
+                    cursor: pointer;
                 }
-                .btn-text:hover { 
+                .btn-text:hover {
                     color: #4338ca;
-                    text-decoration: underline; 
+                    text-decoration: underline;
                 }
             `}</style>
         </div>
