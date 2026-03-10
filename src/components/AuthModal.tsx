@@ -151,6 +151,9 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
                                     onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ""))}
                                     required
                                 />
+                                <p style={{ fontSize: '12px', color: '#64748b', marginTop: '6px', lineHeight: '1.5' }}>
+                                    * 매니저 예약 승인 시 본인 확인에 사용되며, 예약 승인/취소 알림 문자가 발송됩니다.
+                                </p>
                             </div>
                         </>
                     )}
