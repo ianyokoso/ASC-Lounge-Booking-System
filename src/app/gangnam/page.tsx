@@ -1,6 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
+import { unstable_cache } from "next/cache";
 import GangnamBookingPage from "./GangnamBookingPage";
+
+const getCachedGangnamReservations = unstable_cache(
+  async () => {
+    const reservations = await prisma.gangnamReservation.findMany({
+      where: { status: { in: ["PENDING", "CONFIRMED"] } },
+      orderBy: { createdAt: "asc" },
+    });
+    return reservations;
+  },
+  ["gangnam-reservations"],
+  { revalidate: 60, tags: ["gangnam-reservations"] }
+);
 
 async function getInitialData() {
   const cookieStore = await cookies();
@@ -13,10 +26,7 @@ async function getInitialData() {
       })
     : Promise.resolve(null);
 
-  const reservationsPromise = prisma.gangnamReservation.findMany({
-    where: { status: { in: ["PENDING", "CONFIRMED"] } },
-    orderBy: { createdAt: "asc" },
-  });
+  const reservationsPromise = getCachedGangnamReservations();
 
   const [user, reservations] = await Promise.all([
     userPromise,
@@ -29,7 +39,6 @@ async function getInitialData() {
     availMap[r.date].push(r.timeSlot);
   });
 
-  // Get user's own gangnam reservations
   const myReservations = userId
     ? reservations.filter((r) => r.userId === userId)
     : [];
