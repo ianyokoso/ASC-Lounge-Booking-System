@@ -31,6 +31,14 @@ export default function Home() {
       bgColor: "#eef2ff",
     },
     {
+      name: "강남 라운지",
+      desc: "ASC Gangnam Lounge",
+      href: "/gangnam",
+      isExternal: false,
+      color: "#d946ef",
+      bgColor: "#fdf4ff",
+    },
+    {
       name: "안국 라운지",
       desc: "Ankuk Station",
       href: "https://m.booking.naver.com/booking/6/bizes/715955/items/7031202?area=pll&lang=ko&startDate=2025-09-01&theme=place",
