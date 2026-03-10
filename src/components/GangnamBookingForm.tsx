@@ -254,11 +254,39 @@ export default function GangnamBookingForm({
                           <div className="mini-res-time">
                             <Clock size={12} /> {r.timeSlot}
                           </div>
-                          <div
-                            className="mini-res-status"
-                            style={{ background: sc.bg, color: sc.color }}
-                          >
-                            {statusLabel(r.status)}
+                          <div className="mini-res-bottom">
+                            <div
+                              className="mini-res-status"
+                              style={{ background: sc.bg, color: sc.color }}
+                            >
+                              {statusLabel(r.status)}
+                            </div>
+                            {r.status !== "REJECTED" && (
+                              <button
+                                className="btn-cancel-mini"
+                                onClick={async () => {
+                                  if (!confirm("예약을 취소하시겠습니까?")) return;
+                                  try {
+                                    const res = await fetch("/api/gangnam/reservations", {
+                                      method: "DELETE",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ id: r.id }),
+                                    });
+                                    if (res.ok) {
+                                      setSuccess("예약이 취소되었습니다.");
+                                      fetchAllAvailability();
+                                    } else {
+                                      const data = await res.json();
+                                      setError(data.error || "취소 실패");
+                                    }
+                                  } catch {
+                                    setError("예약 취소 중 오류가 발생했습니다.");
+                                  }
+                                }}
+                              >
+                                예약 취소
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -527,12 +555,31 @@ export default function GangnamBookingForm({
           font-size: 11px; color: #64748b; font-weight: 600;
           display: flex; align-items: center; gap: 4px; margin-bottom: 8px;
         }
+        .mini-res-bottom {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
         .mini-res-status {
           font-size: 12px;
           font-weight: 700;
           padding: 4px 10px;
           border-radius: 8px;
           display: inline-block;
+        }
+        .btn-cancel-mini {
+          font-size: 12px;
+          color: #ef4444;
+          font-weight: 600;
+          background: #fff1f2;
+          border: none;
+          padding: 4px 10px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-cancel-mini:hover {
+          background: #fee2e2;
         }
 
         /* Summary Card */
