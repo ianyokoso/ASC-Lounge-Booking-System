@@ -104,6 +104,18 @@ export default function GangnamBookingForm({
       return;
     }
 
+    // 3일 이내 예약 경고
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selected = new Date(selectedDate);
+    selected.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((selected.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 0 && diffDays <= 3) {
+      if (!confirm(`선택하신 날짜는 ${diffDays}일 후입니다.\n최소 3~4일 전 사전 예약을 권장합니다.\n\n그래도 예약하시겠습니까?`)) {
+        return;
+      }
+    }
+
     setLoading(true);
     setError("");
     setSuccess("");
@@ -248,22 +260,6 @@ export default function GangnamBookingForm({
                     {isWeekend(selectedDate) ? "주말" : "평일"}
                   </div>
                 </div>
-                {(() => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  const selected = new Date(selectedDate);
-                  selected.setHours(0, 0, 0, 0);
-                  const diffDays = Math.ceil((selected.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                  if (diffDays >= 0 && diffDays <= 3) {
-                    return (
-                      <div className="short-notice-warning">
-                        <AlertCircle size={14} />
-                        <span>선택하신 날짜는 {diffDays}일 후입니다. 최소 3~4일 전 사전 예약을 권장합니다.</span>
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
               </>
             )}
           </div>
@@ -534,21 +530,6 @@ export default function GangnamBookingForm({
           color: #991b1b;
           font-weight: 600;
           line-height: 1.5;
-        }
-
-        /* Short Notice Warning */
-        .short-notice-warning {
-          margin-top: 10px;
-          background: #fff7ed;
-          border: 1px solid #fed7aa;
-          border-radius: 10px;
-          padding: 10px 14px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-          font-weight: 600;
-          color: #c2410c;
         }
 
         /* Alerts */
