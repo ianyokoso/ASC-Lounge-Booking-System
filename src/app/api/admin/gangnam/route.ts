@@ -41,3 +41,32 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: "상태 변경 중 오류가 발생했습니다." }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const { id } = await request.json();
+
+        if (!id) {
+            return NextResponse.json({ error: "예약 ID가 필요합니다." }, { status: 400 });
+        }
+
+        const reservation = await prisma.gangnamReservation.findUnique({ where: { id } });
+
+        if (!reservation) {
+            return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
+        }
+
+        await prisma.gangnamReservation.delete({ where: { id } });
+
+        // 예약자에게 취소 SMS 알림
+        if (reservation.phoneNumber) {
+            const text = `[ASC 강남 라운지 안내]\n${reservation.name}님의 ${reservation.date} ${reservation.timeSlot} 예약이 관리자에 의해 취소되었습니다.`;
+            await sendSms(reservation.phoneNumber, text).catch(e => console.error("Admin Cancel SMS Error:", e));
+        }
+
+        return NextResponse.json({ message: "예약이 취소되었습니다." });
+    } catch (error: any) {
+        console.error("Admin Gangnam DELETE Error:", error);
+        return NextResponse.json({ error: "예약 삭제 중 오류가 발생했습니다." }, { status: 500 });
+    }
+}

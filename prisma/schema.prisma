@@ -52,3 +52,9 @@ model GangnamReservation {
 
   @@unique([date, timeSlot])
 }
+
+model SiteConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

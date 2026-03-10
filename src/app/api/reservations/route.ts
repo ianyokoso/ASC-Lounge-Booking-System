@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
+import { sendSms } from "@/lib/solapi";
 
 // GET: 예약 조회
 export async function GET(req: Request) {
@@ -110,6 +111,13 @@ export async function POST(req: Request) {
         // @ts-ignore
         revalidateTag("reservations");
 
+        // 예약자에게 SMS 알림
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { phoneNumber: true } });
+        if (user?.phoneNumber) {
+            const text = `[ASC 구로 라운지 예약 확인]\n예약 일시: ${date} ${timeSlot}\n예약이 완료되었습니다.`;
+            await sendSms(user.phoneNumber, text).catch(e => console.error("Reservation SMS Error:", e));
+        }
+
         return NextResponse.json(
             { message: "예약 성공", reservation: newReservation },
             { status: 201 }
@@ -171,6 +179,13 @@ export async function DELETE(req: Request) {
 
         // @ts-ignore
         revalidateTag("reservations");
+
+        // 예약자에게 취소 SMS 알림
+        const cancelUser = await prisma.user.findUnique({ where: { id: userId }, select: { phoneNumber: true } });
+        if (cancelUser?.phoneNumber) {
+            const text = `[ASC 구로 라운지 예약 취소]\n예약 일시: ${reservation.date} ${reservation.timeSlot}\n예약이 취소되었습니다.`;
+            await sendSms(cancelUser.phoneNumber, text).catch(e => console.error("Cancel SMS Error:", e));
+        }
 
         return NextResponse.json({ message: "예약이 취소되었습니다" });
     } catch (error: any) {
