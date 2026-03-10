@@ -84,6 +84,13 @@ export default function GangnamBookingForm({
     }
   };
 
+  // 마운트 시 및 로그인 후 최신 예약 데이터 fetch (나의 예약 현황 즉시 표시)
+  useEffect(() => {
+    if (user) {
+      fetchAllAvailability();
+    }
+  }, [user]);
+
   useEffect(() => {
     if (selectedDate) {
       const slots = allAvailability[selectedDate] || [];
