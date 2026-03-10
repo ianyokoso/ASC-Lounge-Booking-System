@@ -516,7 +516,7 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                     display: flex;
                     gap: 8px;
                 }
-                .btn-approve, .btn-reject {
+                .btn-approve, .btn-reject, .btn-cancel {
                     display: flex;
                     align-items: center;
                     gap: 6px;
@@ -527,6 +527,7 @@ export default function GangnamAdminManager({ initialReservations }: GangnamAdmi
                     cursor: pointer;
                     transition: all 0.2s;
                     border: none;
+                    white-space: nowrap;
                 }
                 .btn-approve {
                     background: #dcfce7;
