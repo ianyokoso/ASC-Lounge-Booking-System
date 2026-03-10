@@ -29,7 +29,7 @@ export default function GangnamBookingPage({
         top: 0,
         zIndex: 1000
       }}>
-        <Link href="/gangnam" style={{ marginRight: '20px' }}>
+        <Link href="/" style={{ marginRight: '20px' }}>
           <div
             role="img"
             aria-label="ASC Logo"
