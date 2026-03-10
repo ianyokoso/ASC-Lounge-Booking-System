@@ -74,9 +74,7 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
     };
 
     return (
-        <div className="modal-backdrop" onClick={(e) => {
-            if (e.target === e.currentTarget) onClose();
-        }}>
+        <div className="modal-backdrop">
             <div className="auth-container card">
                 <button className="btn-close" onClick={onClose}>
                     <X size={20} />
