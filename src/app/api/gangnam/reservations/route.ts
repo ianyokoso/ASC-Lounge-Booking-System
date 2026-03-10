@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         // Notify Manager via SMS
         const managerConfig = await prisma.siteConfig.findUnique({ where: { key: "GANGNAM_MANAGER_PHONE" } });
         if (managerConfig?.value) {
-            const text = `[비타임 미팅룸(7인실) 예약 요청]\n이름: ${name}\n날짜: ${date}\n시간: ${timeSlot}\n연락처: ${phoneNumber}\n\n아래 페이지에서 승인 여부 확인 바랍니다.\nhttps://asc-lounge-booking-system.vercel.app/gangnam/admin`;
+            const text = `[비타임 미팅룸(7인실) 예약 요청]\n이름: ${name}\n날짜: ${date}\n시간: ${timeSlot}\n연락처: ${phoneNumber}\n\n아래 페이지에서 승인 여부 확인 바랍니다.\nhttps://asc-lounge-booking-system.vercel.app/gangnam/manager`;
             await sendSms(managerConfig.value, text).catch(e => console.error("Manager SMS Error:", e));
         } else {
             console.warn("GANGNAM_MANAGER_PHONE not set in SiteConfig.");

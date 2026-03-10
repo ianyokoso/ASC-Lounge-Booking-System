@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "solapi": {
+      "command": "npx",
+      "args": ["--latest", "-y", "@solapi/mcp-server"],
+      "env": {}
+    }
+  }
+}

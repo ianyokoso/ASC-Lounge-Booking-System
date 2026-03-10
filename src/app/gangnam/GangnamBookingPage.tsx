@@ -64,7 +64,7 @@ export default function GangnamBookingPage({
             border: '1px solid transparent',
             lineHeight: '1'
           }}>예약하기</Link>
-          <Link href="/gangnam/status" style={{
+          <Link href="/gangnam/admin" style={{
             textDecoration: 'none',
             color: '#3b82f6',
             fontSize: '15px',
