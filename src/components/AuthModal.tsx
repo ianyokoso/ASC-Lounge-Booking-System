@@ -143,7 +143,7 @@ export default function AuthModal({ onSuccess, onClose }: AuthModalProps) {
                             </div>
 
                             <div className="form-group">
-                                <label><Phone size={14} style={{ marginRight: 4 }} /> 전화번호</label>
+                                <label><Phone size={14} style={{ marginRight: 4 }} /> 전화번호 <span style={{ color: '#ef4444', fontSize: '12px' }}>(필수)</span></label>
                                 <input
                                     type="tel"
                                     placeholder="01012345678"
