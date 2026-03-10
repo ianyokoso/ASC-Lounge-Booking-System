@@ -64,22 +64,6 @@ export default function GangnamBookingPage({
             border: '1px solid transparent',
             lineHeight: '1'
           }}>예약하기</Link>
-          <Link href="/gangnam/admin" style={{
-            textDecoration: 'none',
-            color: '#3b82f6',
-            fontSize: '15px',
-            fontWeight: '700',
-            padding: '10px 24px',
-            background: '#eff6ff',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s',
-            border: '1px solid #dbeafe',
-            lineHeight: '1',
-            boxShadow: '0 2px 4px rgba(59, 130, 246, 0.05)'
-          }}>전체 예약 현황 보기</Link>
         </div>
       </nav>
 
