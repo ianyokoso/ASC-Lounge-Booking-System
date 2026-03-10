@@ -194,6 +194,18 @@ export default function GangnamBookingForm({
         )}
       </div>
 
+      {/* 이용 준수사항 배너 */}
+      <div className="notice-banner">
+        <div className="notice-banner-title">
+          <AlertCircle size={18} />
+          <span>이용 전 꼭 확인해주세요</span>
+        </div>
+        <ul className="notice-banner-list">
+          <li>평일 이용: 22:00에 건물 전체 소등이 되므로 연장은 어렵습니다. (22시 퇴장 필수)</li>
+          <li>예약: 최소 3~4일 전 사전 예약 필수</li>
+        </ul>
+      </div>
+
       {/* Messages */}
       {error && (
         <div className="alert alert-error">
@@ -228,13 +240,31 @@ export default function GangnamBookingForm({
               />
             </div>
             {selectedDate && (
-              <div className="selected-date-banner">
-                <CalendarIcon size={16} />
-                <span>{formatKoreanDate(selectedDate)}</span>
-                <div className={`badge ${isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
-                  {isWeekend(selectedDate) ? "주말" : "평일"}
+              <>
+                <div className="selected-date-banner">
+                  <CalendarIcon size={16} />
+                  <span>{formatKoreanDate(selectedDate)}</span>
+                  <div className={`badge ${isWeekend(selectedDate) ? "badge-weekend" : "badge-weekday"}`}>
+                    {isWeekend(selectedDate) ? "주말" : "평일"}
+                  </div>
                 </div>
-              </div>
+                {(() => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const selected = new Date(selectedDate);
+                  selected.setHours(0, 0, 0, 0);
+                  const diffDays = Math.ceil((selected.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                  if (diffDays >= 0 && diffDays <= 3) {
+                    return (
+                      <div className="short-notice-warning">
+                        <AlertCircle size={14} />
+                        <span>선택하신 날짜는 {diffDays}일 후입니다. 최소 3~4일 전 사전 예약을 권장합니다.</span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+              </>
             )}
           </div>
 
@@ -474,6 +504,52 @@ export default function GangnamBookingForm({
           border: none; cursor: pointer;
         }
         .btn-login-header:hover { background: #334155; transform: translateY(-1px); }
+
+        /* Notice Banner */
+        .notice-banner {
+          background: #fef2f2;
+          border: 1px solid #fecaca;
+          border-radius: 16px;
+          padding: 20px 24px;
+          margin-bottom: 24px;
+        }
+        .notice-banner-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 800;
+          color: #dc2626;
+          font-size: 15px;
+          margin-bottom: 12px;
+        }
+        .notice-banner-list {
+          margin: 0;
+          padding-left: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .notice-banner-list li {
+          font-size: 13px;
+          color: #991b1b;
+          font-weight: 600;
+          line-height: 1.5;
+        }
+
+        /* Short Notice Warning */
+        .short-notice-warning {
+          margin-top: 10px;
+          background: #fff7ed;
+          border: 1px solid #fed7aa;
+          border-radius: 10px;
+          padding: 10px 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #c2410c;
+        }
 
         /* Alerts */
         .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
