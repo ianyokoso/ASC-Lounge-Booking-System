@@ -46,25 +46,7 @@ export default function GangnamBookingPage({
             }}
           />
         </Link>
-        <div style={{
-          height: '100%',
-          flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <Link href="/gangnam" style={{
-            textDecoration: 'none',
-            color: '#334155',
-            fontSize: '15px',
-            fontWeight: '700',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '10px 16px',
-            border: '1px solid transparent',
-            lineHeight: '1'
-          }}>예약하기</Link>
-        </div>
+        <div />
       </nav>
 
       {/* Main Content */}
